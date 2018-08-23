@@ -5,11 +5,11 @@ import { Button } from './../common';
 
 import styles from './Header.css';
 
-const Header = ({ month, changeMode }) => (
+const Header = ({ year, month, changeMode }) => (
   <div className={styles.Wrapper}>
     <div />
     <div>
-      {month}
+      {year} {month}
     </div>
     <div>
       <Button onClick={() => changeMode('weekend')}>
@@ -29,6 +29,7 @@ const Header = ({ month, changeMode }) => (
 );
 
 Header.propTypes = {
+  year: PropTypes.number.isRequired,
   month: PropTypes.string.isRequired,
   changeMode: PropTypes.func.isRequired
 };

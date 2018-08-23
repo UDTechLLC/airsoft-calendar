@@ -8,3 +8,9 @@
   flex: 1;
   width: 1200px;
 }
+
+@media (max-width: 1200px) {
+  .Content {
+    width: 100%
+  }
+}

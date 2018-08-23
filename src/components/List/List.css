@@ -1,7 +1,40 @@
-.Wrapper {
-  border: 10px solid #38afd4;
-  border-radius: 5px;
-  height: 300px;
-  overflow: auto;
-  white-space: nowrap;
+.Year,
+.Month,
+.Day {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  /*margin: 0.5rem;*/
+  /*padding: 0.5rem;*/
+}
+
+.Year {
+  /*border: 1px solid red;*/
+  background-color: red;
+  overflow-x: scroll;
+  min-height: 22rem;
+}
+
+.Month {
+  /*border: 1px solid green;*/
+  /*background-color: green;*/
+  /*flex-direction: column;*/
+  min-height: 21rem;
+}
+
+/*.Month > div {*/
+  /*flex: 1;*/
+  /*flex-direction: row;*/
+/*}*/
+
+.Day {
+  /*border: 1px solid blue;*/
+  background-color: white;
+  /*flex-direction: column;*/
+  min-height: 20rem;
+  min-width: 3.8rem;
+}
+
+.Day.Weekend {
+  background-color: blue;
 }
