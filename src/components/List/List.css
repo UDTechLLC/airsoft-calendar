@@ -1,0 +1,7 @@
+.Wrapper {
+  border: 10px solid #38afd4;
+  border-radius: 5px;
+  height: 300px;
+  overflow: auto;
+  white-space: nowrap;
+}
