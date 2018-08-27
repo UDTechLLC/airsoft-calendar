@@ -9,65 +9,40 @@ import List from './../../components/List/List';
 
 class Homepage extends Component {
   state = {
-    today: undefined,
+    // today: undefined,
     year: undefined,
     month: undefined,
     mode: 'week',
     games: [
-      { id: 0, title: '0', startDate: 1534936707, endDate: 1534944552 },
-      { id: 1, title: '1', startDate: 1534944552, endDate: 1535714306 },
+      { id: 0, title: '0', startDate: 1534936707, endDate: 1535114552 },
+      { id: 1, title: '1', startDate: 1535054552, endDate: 1535554306 },
       { id: 2, title: '2', startDate: 1534936707, endDate: 1535714306 },
-      { id: 3, title: '3', startDate: 1535357118, endDate: 1535360681 }
+      { id: 3, title: '3', startDate: 1535357118, endDate: 1535380681 }
     ]
   };
 
   componentWillMount() {
-    // const date = new Date();
-    // const y = date.getFullYear();
-    // const m = date.getMonth();
-    // this.setState({
-    //   timePeriods: {
-    //     previous: {
-    //       start: new Date(y, m > 0 ? m - 1 : 11, 1),
-    //       end: new Date(y, m, 0)
-    //     },
-    //     now: {
-    //       start: new Date(y, m, 1),
-    //       end: new Date(y, m < 11 ? m + 1 : 0, 0)
-    //     },
-    //     next: {
-    //       start: new Date(y, m < 11 ? m + 1 : 0, 1),
-    //       end: new Date(y, m < 10 ? m + 2 : 0, 0)
-    //     }
-    //   }
-    // });
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-
-    // const daysOfYear = () => (isLeapYear() ? 366 : 365);
-    //
-    // const isLeapYear = () => year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
-    //
-    // const dayOfTheYear = () => {
-    //   const start = new Date(year, 0, 0);
-    //   const diff = today - start;
-    //   const oneDay = 1000 * 60 * 60 * 24;
-    //   return Math.floor(diff / oneDay);
-    // };
-
-    this.setState({ today, year, month });
+    this.setState({ year, month });
   }
 
   handleChangeMode = mode => this.setState({ mode });
 
+  handleChangeTimeScale = (year, month, mode = undefined) => this.setState({
+    year,
+    month,
+    mode: !mode ? this.state.mode : mode
+  });
+
   render() {
-    const { today, mode, year, month, games } = this.state;
+    const { mode, year, month, games } = this.state;
 
     return (
       <div>
         <Header year={year} month={MONTH_NAMES[month]} changeMode={this.handleChangeMode} />
-        <List {...{ today, mode, year, month, games }} />
+        <List changeScale={this.handleChangeTimeScale} {...{ mode, year, month, games }} />
       </div>
     );
   }

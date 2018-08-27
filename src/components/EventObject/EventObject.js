@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import styles from './EventLine.css';
+import styles from './EventObject.css';
 
-const EventLine = ({ style, event }) => {
+const EventObject = ({ style, event }) => {
   const { title, startTime, endTime } = event;
   return (
     <div
@@ -17,12 +17,12 @@ const EventLine = ({ style, event }) => {
   );
 };
 
-EventLine.propTypes = {
+EventObject.propTypes = {
   style: PropTypes.shape(),
   event: PropTypes.shape(),
 };
 
-EventLine.defaultProps = {
+EventObject.defaultProps = {
   style: {},
   event: {
     title: 'EventLine',
@@ -31,4 +31,4 @@ EventLine.defaultProps = {
   }
 };
 
-export default EventLine;
+export default EventObject;

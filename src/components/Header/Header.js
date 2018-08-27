@@ -12,9 +12,11 @@ const Header = ({ year, month, changeMode }) => (
       {year} {month}
     </div>
     <div>
+      {/*
       <Button onClick={() => changeMode('weekend')}>
         Weekend
       </Button>
+      */}
       <Button onClick={() => changeMode('week')}>
         Week
       </Button>

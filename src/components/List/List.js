@@ -1,4 +1,4 @@
-/* eslint-disable react/no-did-mount-set-state,prefer-destructuring */
+/* eslint-disable react/no-did-mount-set-state,prefer-destructuring,react/no-did-update-set-state */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
@@ -7,7 +7,7 @@ import _ from 'lodash';
 // import ReactList from 'react-list';
 
 // import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
-import EventLine from './../EventLine/EventLine';
+import EventObject from '../EventObject/EventObject';
 
 import styles from './List.css';
 
@@ -20,24 +20,28 @@ class List extends Component {
     if (this[`year_${year}`] && this[`month_${month}`]) {
       this[`year_${year}`].scrollLeft = this.getDom(`month_${month}`).x;
     }
+
     if (this.month_0 && this.month_11) {
       const firstDom = this.getDom('month_0');
       const lastDom = this.getDom('month_11');
-      // console.log(firstDom);
-      // console.log(lastDom);
       this.setState({ fullWidth: Math.abs(firstDom.left) + Math.abs(lastDom.right) });
     }
   }
 
-  getNumberOfDays = (y, m) => new Date(y, m, 0).getDate();
+  componentDidUpdate() {
+    const { month, year } = this.props;
+
+    if (this[`year_${year}`] && this[`month_${month}`] && !this[`year_${year}`].scrollLeft) {
+      this[`year_${year}`].scrollLeft = this.getDom(`month_${month}`).x;
+    }
+  }
+
+  getNumberOfDays = (y, m) => new Date(y, m < 11 ? m + 1 : 0, 0).getDate();
 
   getDom = refname => ReactDOM.findDOMNode(this[refname]).getBoundingClientRect();
 
   getHoursFromTimestamps = (end, start) => {
-    // console.log('end', new Date(end * 1000));
-    // console.log('start', new Date(start * 1000));
     const time = (end - start) / 3600;
-    // console.log(parseFloat(time.toFixed(2), 10));
     return parseFloat(time.toFixed(2), 10);
   };
 
@@ -55,15 +59,23 @@ class List extends Component {
     // console.log(this.getDom(`month-${month}`));
   };
 
-  renderYear = (children = <div />) => {
-    const { year } = this.props;
+  renderYear = (children = <div />, callback = () => undefined) => {
+    const { year, mode } = this.props;
 
-    return (
-      <div className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
-        {children}
-        {this.renderEvents(year)}
-      </div>
-    );
+    switch (mode) {
+      case 'year':
+        return (
+          <div className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
+            {callback(year)}
+          </div>
+        );
+      default: return (
+        <div className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
+          {children}
+          {this.renderEventsObjects(year)}
+        </div>
+      );
+    }
   };
 
   renderMonths = (callback = () => <div />) => {
@@ -88,49 +100,50 @@ class List extends Component {
 
   renderDays = (year, month) => {
     const num = this.getNumberOfDays(year, month);
-    const day = d => new Date(year, month, d).getDay();
-
+    const day = d => new Date(year, month, d + 1).getDay();
     return Array.apply([], Array(num)).map((v, d) => (
       <div
         key={d}
         className={[
           styles.Day,
-          day(d) === 6 || day(d) === 0 ? styles.Weekend : undefined
+          day(d) === 0 || day(d) === 6 ? styles.Weekend : undefined
         ].join(' ')}
       >
         {/* <div>
           {DAY_NAMES[day(d)]}
         </div>
         <div> */}
-        {d}
+        {d + 1}
         {/* </div> */}
       </div>
     ));
   };
 
-  renderEvents = (year = this.props.year) => {
-    const { games } = this.props;
+  renderEventsObjects = (year = this.props.year) => {
+    const { mode, games } = this.props;
     const { fullWidth } = this.state;
-    // if something went wrong
-    if (!fullWidth) return undefined;
+
+    // if something went wrong or this is wrong mode
+    if (!fullWidth || mode !== 'week') return undefined;
+
     // check if there`s some coincidence
     let gamesArr = this.splitEventsArray(games);
 
     if (!gamesArr[1] || !gamesArr[1].length) {
+      //  if there is no coincidence
       gamesArr.splice(1, 1);
     } else {
+      //  if there's some coincidence - check coincidence array to the end
       gamesArr = this.splitLoop(gamesArr);
     }
 
+    //  if there is no games
     if (!gamesArr[0].length) {
       return <div className={styles.Events} style={{ width: fullWidth }} />;
     }
 
     const unit = fullWidth / (this.daysOfYear() * 24);
-    // console.log(1178 * 12, fullWidth);
-    // console.log(fullWidth / this.daysOfYear());
     const firstDayOfYear = new Date(year, 0, 1).getTime() / 1000;
-    console.log(new Date(year, 0, 1).getTime() / 1000);
 
     return (
       <div className={styles.Events} style={{ width: fullWidth }}>
@@ -140,7 +153,7 @@ class List extends Component {
             className={styles.EventsRow}
           >
             {row.map(event => (
-              <EventLine
+              <EventObject
                 key={event.id}
                 event={event}
                 style={{
@@ -192,14 +205,44 @@ class List extends Component {
     return array;
   };
 
+  renderEventCircle = (year = this.props.year, month = this.props.month) => {
+    const { mode, games, changeScale } = this.props;
+
+    let timestamp = {
+      start: new Date(year, month, 1).getTime(),
+      end: new Date(year, month + 1, 0).getTime()
+    };
+
+    if (mode === 'year') {
+      timestamp = {
+        start: new Date(year, 0, 1).getTime(),
+        end: new Date(year, 11, 0).getTime()
+      };
+    }
+
+    const events = _.filter(games, o => (
+      o.startDate >= (timestamp.start / 1000) && o.startDate <= (timestamp.end / 1000)
+    )) || [];
+
+    return (
+      <button
+        type="button"
+        className={styles.EventCircle}
+        onClick={() => changeScale(year, month, mode === 'year' ? 'month' : 'week')}
+      >
+        {events.length}
+      </button>
+    );
+  };
+
   renderContent = () => {
     const { mode } = this.props;
 
     switch (mode) {
       case 'year':
-        return this.renderYear();
+        return this.renderYear(undefined, y => this.renderEventCircle(y));
       case 'month':
-        return this.renderYear(this.renderMonths());
+        return this.renderYear(this.renderMonths((y, m) => this.renderEventCircle(y, m)));
       default:
         return this.renderYear(this.renderMonths((y, m) => this.renderDays(y, m)));
     }
@@ -222,48 +265,12 @@ List.propTypes = {
   mode: PropTypes.string.isRequired,
   year: PropTypes.number.isRequired,
   month: PropTypes.number.isRequired,
-  games: PropTypes.arrayOf(PropTypes.shape())
+  games: PropTypes.arrayOf(PropTypes.shape()),
+  changeScale: PropTypes.func.isRequired
 };
 
 List.defaultProps = {
   games: []
 };
 
-// ListContainer.defaultProps = {
-//   games: []
-// };
-
 export default sizeMe()(List);
-
-// import React from 'react';
-// import PropTypes from 'prop-types';
-// import ReactList from 'react-list';
-// // import LazyLoading from 'react-list-lazy-load';
-//
-// import styles from './List.css';
-//
-// const List = ({ length, initialIndex }) => {
-//   const renderItem = (index, key) => (
-//     <div key={key} style={{ width: 100 }}>
-//       {index + 1}
-//     </div>
-//   );
-//
-//   return (
-//     <div className={styles.Wrapper}>
-//       <ReactList
-//         axis="x"
-//         initialIndex={initialIndex}
-//         length={length}
-//         itemRenderer={renderItem}
-//       />
-//     </div>
-//   );
-// };
-//
-// List.propTypes = {
-//   length: PropTypes.number.isRequired,
-//   initialIndex: PropTypes.number.isRequired,
-// };
-//
-// export default List;
