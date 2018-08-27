@@ -16,7 +16,8 @@ class Homepage extends Component {
     games: [
       { id: 0, title: '0', startDate: 1534936707, endDate: 1534944552 },
       { id: 1, title: '1', startDate: 1534944552, endDate: 1535714306 },
-      { id: 2, title: '2', startDate: 1534936707, endDate: 1535714306 }
+      { id: 2, title: '2', startDate: 1534936707, endDate: 1535714306 },
+      { id: 3, title: '3', startDate: 1535357118, endDate: 1535360681 }
     ]
   };
 
