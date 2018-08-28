@@ -1,0 +1,15 @@
+.Button {
+  position: relative;
+  border-radius: 1.8rem;
+  border: 2px solid #acacac;
+  padding: 0.9rem 2.1rem;
+  color: white;
+  font-weight: 700;
+  background-color: transparent;
+  font-size: 1.6rem;
+  margin: 0.7rem;
+}
+
+.Button.Active {
+  background-color: #acacac;
+}

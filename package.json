@@ -37,8 +37,6 @@
     "react-dev-utils": "^4.2.1",
     "react-dom": "^16.1.0",
     "react-infinite-calendar": "^2.3.1",
-    "react-list": "^0.8.10",
-    "react-list-lazy-load": "^1.1.1",
     "react-moment": "^0.6.8",
     "react-places-autocomplete": "^5.4.3",
     "react-redux": "^5.0.6",

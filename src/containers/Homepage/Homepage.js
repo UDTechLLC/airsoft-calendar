@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 // import PropTypes from 'prop-types';
 
 import { MONTH_NAMES } from './../../utils/const';
@@ -12,6 +13,7 @@ class Homepage extends Component {
     // today: undefined,
     year: undefined,
     month: undefined,
+    visualMonth: undefined,
     mode: 'week',
     games: [
       { id: 0, title: '0', startDate: 1534936707, endDate: 1535114552 },
@@ -36,13 +38,24 @@ class Homepage extends Component {
     mode: !mode ? this.state.mode : mode
   });
 
+  handleChangeVisualMonth = visualMonth => this.setState({ visualMonth });
+
   render() {
-    const { mode, year, month, games } = this.state;
+    const { mode, year, month, games, visualMonth } = this.state;
+    // console.log(month, visualMonth);
 
     return (
       <div>
-        <Header year={year} month={MONTH_NAMES[month]} changeMode={this.handleChangeMode} />
-        <List changeScale={this.handleChangeTimeScale} {...{ mode, year, month, games }} />
+        <Header
+          changeMode={this.handleChangeMode}
+          month={_.isNumber(visualMonth) ? MONTH_NAMES[visualMonth] : MONTH_NAMES[month]}
+          {...{ mode, year }}
+        />
+        <List
+          changeScale={this.handleChangeTimeScale}
+          changeVisualMonth={this.handleChangeVisualMonth}
+          {...{ mode, year, month, games }}
+        />
       </div>
     );
   }

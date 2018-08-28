@@ -4,11 +4,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  background-color: #393939;
+  color: white;
 }
 
 .Wrapper > div:nth-of-type(2) {
   flex: 2;
   justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .Wrapper > div:nth-of-type(3) {

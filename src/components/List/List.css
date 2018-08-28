@@ -1,50 +1,75 @@
+/* common */
 .Year,
 .Month,
 .Day {
   display: flex;
   flex-direction: row;
-  /*margin: 0.5rem;*/
-  /*padding: 0.5rem;*/
   box-sizing: border-box;
+  background-color: #3a3a3b;
+  color: white;
 }
 
+/* year */
 .Year {
   flex: 1;
-  /*border: 1px solid red;*/
-  background-color: red;
   overflow-x: scroll;
-  min-height: 22rem;
   position: relative;
 }
 
-.Month {
-  /*border: 1px solid green;*/
-  background-color: green;
-  /*flex-direction: column;*/
-  min-height: 21rem;
+.Year.YearWithLabel,
+.Month.MonthWithLabel {
+  flex-direction: column;
+  border: 2px solid #393939;
+  background-color: #505050;
 }
 
-/*.Months > div {*/
-  /*flex: 1;*/
-  /*flex-direction: row;*/
-/*}*/
+.Year.YearWithLabel > div {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.Year.YearWithLabel > div:nth-of-type(2),
+.Month.MonthWithLabel > div:nth-of-type(2) {
+  padding: 0.4rem;
+}
+
+/* day */
 .Day {
   flex: 1;
-  /*border: 1px solid blue;*/
-  background-color: white;
-  /*flex-direction: column;*/
-  min-height: 20rem;
+  border: 2px solid #393939;
+  flex-direction: column;
   width: 3.8rem;
+  color: white;
 }
 
-.Day.Weekend {
-  background-color: blue;
+.Year.YearWithLabel > div:first-of-type,
+.Month.MonthWithLabel > .MonthLabel,
+.Day > div:first-of-type {
+  height: 4.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 2px solid #393939;
+  font-weight: 700;
 }
 
+.Day > div:nth-of-type(2) {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #3a3a3b;
+  padding: 0.4rem;
+}
+
+.Day.Weekend > div {
+  background-color: #505050;
+}
+
+/* events */
 .Events {
   position: absolute;
-  top: 0;
+  top: 5.15rem;
   left: 0;
   right: 0;
   z-index: 2;
@@ -56,13 +81,15 @@
   flex: 1;
   position: relative;
   height: 2.4rem;
+  margin-bottom: 0.3rem;
 }
 
 .EventCircle {
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
-  background-color: yellow;
+  border: none;
+  background-color: #dcc04a;
   z-index: 2;
   display: flex;
   align-items: center;
