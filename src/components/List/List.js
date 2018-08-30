@@ -12,23 +12,25 @@ import styles from './List.css';
 
 class List extends Component {
   state = {
-    fullWidth: 0,
-    eventLines: 0
+    // fullWidth: 0,
+    eventLines: 0,
+    monthlyDayWidth: (this.props.size.width - 62) / 31,
+    weeklyDayWidth: (this.props.size.width - 14) / 7
   };
 
-  componentDidMount() {
-    const { month, year } = this.props;
-
-    if (this[`year_${year}`] && this[`month_${month}`]) {
-      this[`year_${year}`].scrollLeft = this.getDom(`month_${month}`).x;
-    }
-
-    if (this.month_0 && this.month_11) {
-      const firstDom = this.getDom('month_0');
-      const lastDom = this.getDom('month_11');
-      this.setState({ fullWidth: Math.abs(firstDom.left) + Math.abs(lastDom.right) });
-    }
-  }
+  // componentDidMount() {
+  //   const { month, year } = this.props;
+  //
+  //   if (this[`year_${year}`] && this[`month_${year}_${month}`]) {
+  //     this[`year_${year}`].scrollLeft = this.getDom(`month_${year}_${month}`).x;
+  //   }
+  //
+  //   // if (this.month_0 && this.month_11) {
+  //   //   const firstDom = this.getDom('month_0');
+  //   //   const lastDom = this.getDom('month_11');
+  //   //   this.setState({ fullWidth: Math.abs(firstDom.left) + Math.abs(lastDom.right) });
+  //   // }
+  // }
 
   // shouldComponentUpdate(nextProps, nextState) {
   //   const { eventLines } = this.state;
@@ -36,13 +38,14 @@ class List extends Component {
   //   return !(nextState.eventLines === eventLines) || true;
   // }
 
-  componentDidUpdate() {
-    const { month, year } = this.props;
-
-    if (this[`year_${year}`] && this[`month_${month}`] && !this[`year_${year}`].scrollLeft) {
-      this[`year_${year}`].scrollLeft = this.getDom(`month_${month}`).x;
-    }
-  }
+  // componentDidUpdate() {
+  //   const { month, year } = this.props;
+  //
+  //   if (this[`year_${year}`] && this[`month_${year}_${month}`] &&
+  // !this[`year_${year}`].scrollLeft) {
+  //     this[`year_${year}`].scrollLeft = this.getDom(`month_${year}_${month}`).x;
+  //   }
+  // }
 
   getNumberOfDays = (y, m) => new Date(y, m < 11 ? m + 1 : 0, 0).getDate();
 
@@ -53,23 +56,11 @@ class List extends Component {
     return parseFloat(time.toFixed(2), 10);
   };
 
-  daysOfYear = () => (this.isLeapYear() ? 366 : 365);
+  getDaysOfYear = () => (this.isLeapYear() ? 366 : 365);
 
   isLeapYear = () => {
     const { year } = this.props;
     return year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
-  };
-
-  getMonthLabel = num => {
-    const { mode } = this.props;
-
-    if (mode === 'week') return undefined;
-
-    return (
-      <div className={styles.MonthLabel}>
-        {MONTH_NAMES[num]}
-      </div>
-    );
   };
 
   handleScrollInstance = () => {
@@ -97,58 +88,82 @@ class List extends Component {
     changeVisualMonth(currentMonth);
   };
 
-  renderYear = (children = <div />, callback = () => undefined) => {
-    const { year, mode } = this.props;
-    const { eventLines } = this.state;
+  // renderYear = (children = <div />, callback = () => undefined) => {
+  //   const { year, mode } = this.props;
+  //   const { eventLines } = this.state;
+  //
+  //   switch (mode) {
+  //     case 'year':
+  //       return (
+  //         <div
+  //           className={[
+  //             styles.Year,
+  //             styles.YearWithLabel
+  //           ].join(' ')}
+  //           ref={el => { this[`year_${year}`] = el; }}
+  //         >
+  //           <div>
+  //             {year}
+  //           </div>
+  //           <div style={{ minHeight: !eventLines ? 27 : eventLines * 27 }}>
+  //             {callback(year)}
+  //           </div>
+  //         </div>
+  //       );
+  //     default: return (
+  //       <div className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
+  //         {children}
+  //         {this.renderEventsObjects(year)}
+  //       </div>
+  //     );
+  //   }
+  // };
 
-    switch (mode) {
-      case 'year':
-        return (
-          <div
-            className={[
-              styles.Year,
-              styles.YearWithLabel
-            ].join(' ')}
-            ref={el => { this[`year_${year}`] = el; }}
-          >
-            <div>
-              {year}
-            </div>
-            <div style={{ minHeight: !eventLines ? 27 : eventLines * 27 }}>
-              {callback(year)}
-            </div>
+  renderYear = year => {
+    const { mode } = this.props;
+
+    if (mode === 'year') {
+      return (
+        <div key={year} className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
+          <div>{year}</div>
+          <div>
+            {this.renderMonths(year, m => this.renderEventCircle(year, m))}
           </div>
-        );
-      default: return (
-        <div className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
-          {children}
-          {this.renderEventsObjects(year)}
         </div>
       );
     }
+
+    return (
+      <div key={year} className={styles.Year} ref={el => { this[`year_${year}`] = el; }}>
+        <div>{year}</div>
+        <div>
+          {this.renderMonths(year, m => this.renderDays(year, m))}
+        </div>
+        {this.renderEventsObjects(year)}
+      </div>
+    );
   };
 
-  renderMonths = (callback = () => <div />) => {
-    const { mode, year } = this.props;
+  renderMonths = (year, callback = () => <div />) => {
+    const { mode } = this.props;
 
-    return Array.apply([], Array(12)).map((v, m) => (
+    return (Array.apply([], Array(12)).map((v, month) => (
       <div
-        key={m}
-        className={[
-          styles.Month,
-          mode === 'week' ? undefined : styles.MonthWithLabel
-        ].join(' ')}
-        style={{ flex: this.getNumberOfDays(year, m) }}
-        ref={el => { this[`month_${m}`] = el; }}
+        key={month}
+        className={styles.Month}
+        style={{ flex: mode !== 'year' ? this.getNumberOfDays(year, month) : 1 }}
+        ref={el => { this[`month_${year}_${month}`] = el; }}
       >
-        {this.getMonthLabel(m)}
-        {callback(year, m)}
+        <div>{mode !== 'year' ? MONTH_NAMES[month] : MONTH_NAMES[month].substr(0, 3)}</div>
+        <div>{callback(month)}</div>
       </div>
-    ));
+    )));
   };
 
   renderDays = (year, month) => {
-    const { eventLines } = this.state;
+    const { mode } = this.props;
+    const { eventLines, monthlyDayWidth, weeklyDayWidth } = this.state;
+
     const num = this.getNumberOfDays(year, month);
     const day = d => new Date(year, month, d + 1).getDay();
 
@@ -160,25 +175,32 @@ class List extends Component {
           day(d) === 0 || day(d) === 6 ? styles.Weekend : undefined
         ].join(' ')}
       >
-        <div>
-          {DAY_NAMES[day(d)]}
-        </div>
-        <div style={{ height: !eventLines ? 27 : eventLines * 27 }}>
+        <div>{mode !== 'week' ? DAY_NAMES[day(d)].substr(0, 3) : DAY_NAMES[day(d)]}</div>
+        <div
+          style={{
+            width: mode !== 'week' ? monthlyDayWidth : weeklyDayWidth,
+            height: !eventLines ? 27 : eventLines * 27
+          }}
+        >
           {d + 1}
         </div>
       </div>
     ));
   };
 
-  renderEventsObjects = (year = this.props.year) => {
+  renderEventsObjects = year => {
     const { mode, games } = this.props;
-    const { fullWidth, eventLines } = this.state;
+    // const { eventLines } = this.state;
+    const firstDom = this.getDom(`month_${year}_0`);
+    const lastDom = this.getDom(`month_${year}_11`);
+    const yearWidth = Math.abs(lastDom.right) - Math.abs(firstDom.left);
 
     // if something went wrong or this is wrong mode
-    if (!fullWidth || mode !== 'week') return undefined;
+    if (!yearWidth || mode === 'year') return undefined;
 
+    // console.log(games[year]);
     // check if there`s some coincidence
-    let gamesArr = this.splitEventsArray(games);
+    let gamesArr = this.splitEventsArray(games[year]);
 
     if (!gamesArr[1] || !gamesArr[1].length) {
       //  if there is no coincidence
@@ -187,21 +209,22 @@ class List extends Component {
       //  if there's some coincidence - check coincidence array to the end
       gamesArr = this.splitLoop(gamesArr);
     }
+    console.log(year, yearWidth);
 
     //  if there is no games
     if (!gamesArr[0].length) {
-      return <div className={styles.Events} style={{ width: fullWidth }} />;
+      return <div className={styles.Events} style={{ width: yearWidth }} />;
     }
 
-    const unit = fullWidth / (this.daysOfYear() * 24);
+    const unit = yearWidth / (this.getDaysOfYear() * 24);
     const firstDayOfYear = new Date(year, 0, 1).getTime() / 1000;
 
-    if (eventLines !== gamesArr.length) {
-      this.setState({ eventLines: gamesArr.length });
-    }
+    // if (eventLines !== gamesArr.length) {
+    //   this.setState({ eventLines: gamesArr.length });
+    // }
 
     return (
-      <div className={styles.Events} style={{ width: fullWidth }}>
+      <div className={styles.Events} style={{ width: yearWidth }}>
         {gamesArr.map((row, i) => (
           <div
             key={`${i}_${row.length}`}
@@ -212,8 +235,8 @@ class List extends Component {
                 key={event.id}
                 event={event}
                 style={{
-                  left: this.getHoursFromTimestamps(event.startDate, firstDayOfYear) * unit,
-                  width: this.getHoursFromTimestamps(event.endDate, event.startDate) * unit
+                  left: this.getHoursFromTimestamps(event.date_start, firstDayOfYear) * unit,
+                  width: this.getHoursFromTimestamps(event.date_end, event.date_start) * unit
                 }}
               />
             ))}
@@ -234,8 +257,8 @@ class List extends Component {
       const partition = _.partition(firstArray, o => {
         const j = firstArray.indexOf(o);
         return i !== j && (
-          (o.startDate >= item.startDate && o.startDate <= item.endDate) ||
-          (o.endDate >= item.startDate && o.endDate <= item.endDate)
+          (o.date_start >= item.date_start && o.date_start <= item.date_end) ||
+          (o.date_end >= item.date_start && o.date_end <= item.date_end)
         );
       });
       firstArray = partition[1];
@@ -260,35 +283,25 @@ class List extends Component {
     return array;
   };
 
-  renderEventCircle = (year = this.props.year, month = this.props.month) => {
+  renderEventCircle = (year, month) => {
     const { mode, games, changeScale } = this.props;
     const { eventLines } = this.state;
 
-    let timestamp = {
+    const timestamp = {
       start: new Date(year, month, 1).getTime(),
       end: new Date(year, month + 1, 0).getTime()
     };
 
-    if (mode === 'year') {
-      timestamp = {
-        start: new Date(year, 0, 1).getTime(),
-        end: new Date(year, 11, 0).getTime()
-      };
-    }
-
-    const events = _.filter(games, o => (
-      o.startDate >= (timestamp.start / 1000) && o.startDate <= (timestamp.end / 1000)
+    const events = _.filter(games[year], o => (
+      o.date_start >= (timestamp.start / 1000) && o.date_start <= (timestamp.end / 1000)
     )) || [];
+
+    if (!events.length) return <div className={styles.MonthCircleWrapper} style={{ display: 'block' }} />;
 
     return (
       <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: !eventLines ? 27 : eventLines * 27
-        }}
+        className={styles.MonthCircleWrapper}
+        style={{ height: !eventLines ? 58 : eventLines * 27 }}
       >
         <button
           type="button"
@@ -302,16 +315,13 @@ class List extends Component {
   };
 
   renderContent = () => {
-    const { mode } = this.props;
+    const { games } = this.props;
+    if (games === null) return undefined;
 
-    switch (mode) {
-      case 'year':
-        return this.renderYear(undefined, y => this.renderEventCircle(y));
-      case 'month':
-        return this.renderYear(this.renderMonths((y, m) => this.renderEventCircle(y, m)));
-      default:
-        return this.renderYear(this.renderMonths((y, m) => this.renderDays(y, m)));
-    }
+    const years = Object.keys(games);
+    if (!years) return <div className={[styles.Year, styles.EmptyYear].join(' ')}>There is no info</div>;
+
+    return years.map(year => this.renderYear(year));
   };
 
   render() {
@@ -319,6 +329,7 @@ class List extends Component {
       <div
         ref={el => { this.instance = el; }}
         onScroll={e => this.handleScrollInstance(e)}
+        className={styles.Wrapper}
       >
         {this.renderContent()}
       </div>
@@ -330,14 +341,14 @@ List.propTypes = {
   size: PropTypes.shape().isRequired,
   mode: PropTypes.string.isRequired,
   year: PropTypes.number.isRequired,
-  month: PropTypes.number.isRequired,
-  games: PropTypes.arrayOf(PropTypes.shape()),
+  // month: PropTypes.number.isRequired,
+  games: PropTypes.shape(),
   changeScale: PropTypes.func.isRequired,
   changeVisualMonth: PropTypes.func.isRequired
 };
 
 List.defaultProps = {
-  games: []
+  games: null
 };
 
 export default sizeMe()(List);

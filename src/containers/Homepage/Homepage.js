@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import _ from 'lodash';
-// import PropTypes from 'prop-types';
 
 import { MONTH_NAMES } from './../../utils/const';
 import Header from './../../components/Header/Header';
@@ -14,13 +15,7 @@ class Homepage extends Component {
     year: undefined,
     month: undefined,
     visualMonth: undefined,
-    mode: 'week',
-    games: [
-      { id: 0, title: '0', startDate: 1534936707, endDate: 1535114552 },
-      { id: 1, title: '1', startDate: 1535054552, endDate: 1535554306 },
-      { id: 2, title: '2', startDate: 1534936707, endDate: 1535714306 },
-      { id: 3, title: '3', startDate: 1535357118, endDate: 1535380681 }
-    ]
+    mode: 'year'
   };
 
   componentWillMount() {
@@ -41,8 +36,9 @@ class Homepage extends Component {
   handleChangeVisualMonth = visualMonth => this.setState({ visualMonth });
 
   render() {
-    const { mode, year, month, games, visualMonth } = this.state;
-    // console.log(month, visualMonth);
+    const { games } = this.props;
+    const { mode, year, month, visualMonth } = this.state;
+    // console.log(games);
 
     return (
       <div>
@@ -54,11 +50,24 @@ class Homepage extends Component {
         <List
           changeScale={this.handleChangeTimeScale}
           changeVisualMonth={this.handleChangeVisualMonth}
-          {...{ mode, year, month, games }}
+          games={games}
+          {...{ mode, year, month }}
         />
       </div>
     );
   }
 }
 
-export default Homepage;
+Homepage.propTypes = {
+  games: PropTypes.shape()
+};
+
+Homepage.defaultProps = {
+  games: null
+};
+
+const mapStateToProps = state => ({
+  games: state.games.games
+});
+
+export default connect(mapStateToProps)(Homepage);

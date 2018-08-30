@@ -3,32 +3,39 @@ import PropTypes from 'prop-types';
 
 import styles from './EventObject.css';
 
-const EventObject = ({ style, event }) => {
-  const { title, startTime, endTime } = event;
+// eslint-disable-next-line arrow-body-style
+const EventObject = ({ style/* , event */ }) => {
+  // const getHM = timestamp => {
+  //   const date = new Date(timestamp);
+  //   return `${date.getHours()}:${date.getMinutes()}`;
+  // };
+
   return (
     <div
       className={styles.Wrapper}
       style={{ backgroundColor: '#dcc04a', ...style }}
     >
-      <span>{startTime}</span>
-      <span>{title}</span>
-      <span>{endTime}</span>
+      {/*
+      <span>{getHM(event.date_start)}</span>
+      <span>{event.name}</span>
+      <span>{getHM(event.date_end)}</span>
+      */}
     </div>
   );
 };
 
 EventObject.propTypes = {
   style: PropTypes.shape(),
-  event: PropTypes.shape(),
+  // event: PropTypes.shape(),
 };
 
 EventObject.defaultProps = {
   style: {},
-  event: {
-    title: 'EventLine',
-    startTime: '00:00',
-    endTime: '00:00',
-  }
+  // event: {
+  //   name: 'EventLine',
+  //   date_start: '00:00',
+  //   date_end: '00:00',
+  // }
 };
 
 export default EventObject;

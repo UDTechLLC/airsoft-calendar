@@ -2,7 +2,7 @@ import * as actionTypes from './../actions/actionTypes';
 import { updateObject } from './../../utils/utils';
 
 const initialState = {
-  data: undefined,
+  games: null,
   error: null,
   loading: false
 };
@@ -14,8 +14,8 @@ const actionFail = (state, { payload }) => updateObject(state, {
   loading: false
 });
 
-const actionSuccess = (state, { payload }) => updateObject(state, {
-  data: payload.data,
+const getGamesSuccess = (state, { payload }) => updateObject(state, {
+  games: payload.games,
   error: null,
   loading: false
 });
@@ -24,14 +24,14 @@ const reducer = (state = initialState, action) => {
   if (action) {
     switch (action.type) {
       //  start actions
-      case actionTypes.EXAMPLE_START:
+      case actionTypes.GET_GAMES_START:
         return actionStart(state, action);
       //  fail actions
-      case actionTypes.EXAMPLE_FAIL:
+      case actionTypes.GET_GAMES_FAIL:
         return actionFail(state, action);
       //  success actions
-      case actionTypes.EXAMPLE_SUCCESS:
-        return actionSuccess(state, action);
+      case actionTypes.GET_GAMES_SUCCESS:
+        return getGamesSuccess(state, action);
       default:
         return state;
     }

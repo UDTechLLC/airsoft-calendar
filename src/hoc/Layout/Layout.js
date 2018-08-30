@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Aux from './../Aux/Aux';
@@ -23,8 +22,4 @@ Layout.propTypes = {
   children: PropTypes.node.isRequired
 };
 
-const mapStateToProps = state => ({
-  isAuth: state.auth.authKey !== null
-});
-
-export default connect(mapStateToProps)(Layout);
+export default Layout;

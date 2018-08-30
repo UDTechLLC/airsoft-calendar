@@ -1,75 +1,7 @@
-/* common */
-.Year,
-.Month,
-.Day {
-  display: flex;
-  flex-direction: row;
-  box-sizing: border-box;
-  background-color: #3a3a3b;
-  color: white;
-}
-
-/* year */
-.Year {
-  flex: 1;
-  overflow-x: scroll;
-  position: relative;
-}
-
-.Year.YearWithLabel,
-.Month.MonthWithLabel {
-  flex-direction: column;
-  border: 2px solid #393939;
-  background-color: #505050;
-}
-
-.Year.YearWithLabel > div {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.Year.YearWithLabel > div:nth-of-type(2),
-.Month.MonthWithLabel > div:nth-of-type(2) {
-  padding: 0.4rem;
-}
-
-/* day */
-.Day {
-  flex: 1;
-  border: 2px solid #393939;
-  flex-direction: column;
-  width: 3.8rem;
-  color: white;
-}
-
-.Year.YearWithLabel > div:first-of-type,
-.Month.MonthWithLabel > .MonthLabel,
-.Day > div:first-of-type {
-  height: 4.2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-bottom: 2px solid #393939;
-  font-weight: 700;
-}
-
-.Day > div:nth-of-type(2) {
-  display: flex;
-  justify-content: flex-end;
-  background-color: #3a3a3b;
-  padding: 0.4rem;
-}
-
-.Day.Weekend > div {
-  background-color: #505050;
-}
-
 /* events */
 .Events {
   position: absolute;
-  top: 5.15rem;
+  top: calc(12.6rem + 6px + 0.4rem);
   left: 0;
   right: 0;
   z-index: 2;
@@ -78,7 +10,6 @@
 }
 
 .EventsRow {
-  flex: 1;
   position: relative;
   height: 2.4rem;
   margin-bottom: 0.3rem;
@@ -91,7 +22,6 @@
   border: none;
   background-color: #dcc04a;
   z-index: 2;
-  display: flex;
   align-items: center;
   justify-content: center;
   align-self: center;
@@ -99,4 +29,67 @@
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.06px;
+}
+
+/* rethinking */
+.Wrapper {
+  flex: 1;
+  display: flex;
+  overflow-x: scroll;
+  background-color: #393939;
+  color: #fff;
+}
+
+.Wrapper div {
+  display: flex;
+  box-sizing: border-box;
+}
+
+.Year {
+  position: relative;
+}
+
+.Year,
+.Month,
+.Day {
+  flex-direction: column;
+  border-right: 2px solid #393939;
+  flex: 1;
+}
+
+.Month:last-of-type,
+.Day:last-of-type {
+  border-right: none;
+}
+
+.Year > div:first-of-type,
+.Month > div:first-of-type,
+.Day > div:first-of-type {
+  height: 4.2rem;
+  border-bottom: 2px solid #393939;
+  font-weight: 700;
+  background-color: #505050;
+}
+
+.Year > div:first-of-type,
+.Month > div:first-of-type,
+.Day > div:first-of-type,
+.EmptyYear,
+.MonthCircleWrapper {
+  align-items: center;
+  justify-content: center;
+}
+
+.Month {
+  min-width: 8rem;
+}
+
+.MonthCircleWrapper {
+  /*min-height: 5.8rem;*/
+  flex: 1;
+  padding: 0.4rem;
+}
+
+.Day > div:nth-of-type(2) {
+  justify-content: flex-end;
 }
