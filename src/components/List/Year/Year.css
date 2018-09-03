@@ -1,0 +1,18 @@
+.Year {
+  position: relative;
+  flex-direction: column;
+  border-right: 2px solid #393939;
+  flex: 1;
+}
+
+.Year > div:first-of-type {
+  height: 4.2rem;
+  border-bottom: 2px solid #393939;
+  font-weight: 700;
+  background-color: #505050;
+}
+
+.Year > div:first-of-type  {
+  align-items: center;
+  justify-content: center;
+}

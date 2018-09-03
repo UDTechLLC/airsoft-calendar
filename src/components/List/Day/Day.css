@@ -1,0 +1,25 @@
+.Day {
+  flex-direction: column;
+  border-right: 2px solid #393939;
+  flex: 1;
+}
+
+.Day:last-of-type {
+  border-right: none;
+}
+
+.Day > div:first-of-type {
+  height: 4.2rem;
+  border-bottom: 2px solid #393939;
+  font-weight: 700;
+  background-color: #505050;
+}
+
+.Day > div:first-of-type {
+  align-items: center;
+  justify-content: center;
+}
+
+.Day > div:nth-of-type(2) {
+  justify-content: flex-end;
+}
