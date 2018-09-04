@@ -16,9 +16,11 @@ const EventObject = ({ style, event }) => {
       className={styles.Wrapper}
       style={{ backgroundColor: '#dcc04a', ...style }}
     >
-      <span>{getHM(event.date_start)}</span>
-      <span>{event.name}</span>
-      <span>{getHM(event.date_end)}</span>
+      <div className={styles.Content}>
+        <span>{getHM(event.date_start)}</span>
+        {/* <span>{event.name}</span> */}
+        <span>{getHM(event.date_end)}</span>
+      </div>
     </div>
   );
 };

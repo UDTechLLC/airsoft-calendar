@@ -1,6 +1,6 @@
 .Events {
   position: absolute;
-  top: calc(12.6rem + 6px + 0.4rem);
+  top: calc(12.6rem + 0.4rem);
   left: 0;
   right: 0;
   z-index: 2;
@@ -11,5 +11,8 @@
 .EventsRow {
   position: relative;
   height: 2.4rem;
+}
+
+.EventsRow:not(:last-of-type) {
   margin-bottom: 0.3rem;
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
 import sizeMe from 'react-sizeme';
 import _ from 'lodash';
 
@@ -9,10 +10,11 @@ import styles from './List.css';
 
 class List extends Component {
   state = {
-    eventRows: [],
     monthlyDayWidth: parseFloat(((this.props.size.width - 62) / 31).toFixed(2), 10),
     weeklyDayWidth: parseFloat(((this.props.size.width - 14) / 7).toFixed(2), 10)
   };
+
+  getDom = refname => ReactDOM.findDOMNode(this[refname]).getBoundingClientRect();
 
   handleScrollInstance = () => {
     const { size, changeVisualMonth } = this.props;
@@ -40,35 +42,46 @@ class List extends Component {
 
   renderContent = () => {
     const { games, mode, changeScale } = this.props;
-    const { eventRows, monthlyDayWidth, weeklyDayWidth } = this.state;
+    const { monthlyDayWidth, weeklyDayWidth } = this.state;
 
-    if (games === null) return undefined;
+    if (games === null) return <div />;
 
     const years = Object.keys(games);
     if (!years) return <div className={[styles.Year, styles.EmptyYear].join(' ')}>There is no info</div>;
+
+    const buildedRows = _.keysIn(this.state).filter(k => {
+      const pos = k.indexOf('event_rows->');
+      return pos >= 0 ? k.substr(0, pos + 12) : false;
+    }).map(k => this.state[k]);
 
     return years.map((year, i) => (
       <Year
         key={i}
         year={parseInt(year, 10)}
         mode={mode}
-        eventRows={eventRows.length ? _.max(eventRows) : 1}
+        eventRows={buildedRows.length ? _.max(buildedRows) : 1}
         monthlyDayWidth={monthlyDayWidth}
         weeklyDayWidth={weeklyDayWidth}
         games={games}
         changeScale={changeScale}
-        getEventRows={rows => this.setState({ eventRows: rows })}
+        getEventRows={(key, rows) => {
+         this.setState({ [`event_rows->${key}`]: rows });
+        }}
       />
     ));
   };
 
+  onMouseWheel = e => {
+    this.instance.scrollLeft = this.instance.scrollLeft + e.deltaY;
+  };
+
   render() {
-    console.log(this.state.eventRows);
     return (
       <div
         ref={el => { this.instance = el; }}
-        onScroll={e => this.handleScrollInstance(e)}
         className={styles.Wrapper}
+        onScroll={e => this.handleScrollInstance(e)}
+        onWheel={e => this.onMouseWheel(e)}
       >
         {this.renderContent()}
       </div>

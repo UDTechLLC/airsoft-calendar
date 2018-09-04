@@ -6,7 +6,6 @@ import EventObject from './EventObject/EventObject';
 
 import styles from './Events.css';
 
-// const Events = ({ width, mode, games, year, unit/* , getEventRows */ })
 class Events extends Component {
   state = { gamesArr: undefined };
 

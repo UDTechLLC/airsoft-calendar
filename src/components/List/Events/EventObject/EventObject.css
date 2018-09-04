@@ -2,15 +2,20 @@
   height: 2.4rem;
   border-radius: 1.2rem;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   color: #000;
-  /*font-family: Helvetica, sans-serif;*/
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.06px;
-  /*padding: 0 1rem;*/
   position: absolute;
   top: 0;
+}
+
+.Content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
 }

@@ -81,7 +81,7 @@ const Year = ({
         games={games[year] ? games[year] : []}
         year={year}
         unit={unit}
-        getEventRows={rows => getEventRows(rows)}
+        getEventRows={rows => getEventRows(year, rows)}
       />
     );
   };

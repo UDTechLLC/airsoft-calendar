@@ -21,7 +21,7 @@ const Day = ({ weekend, mode, index, monthlyDayWidth, weeklyDayWidth, eventRows,
     <div
       style={{
         width: mode !== 'week' ? monthlyDayWidth : weeklyDayWidth,
-        height: !eventRows ? 27 : eventRows * 27
+        height: !eventRows ? 27 + 4 : (eventRows * 27) + 4
       }}
     >
       {children}
