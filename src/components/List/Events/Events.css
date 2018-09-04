@@ -1,0 +1,15 @@
+.Events {
+  position: absolute;
+  top: calc(12.6rem + 6px + 0.4rem);
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.EventsRow {
+  position: relative;
+  height: 2.4rem;
+  margin-bottom: 0.3rem;
+}

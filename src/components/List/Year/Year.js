@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import sizeMe from 'react-sizeme';
 
-import { getNumberOfDays } from './../../../utils/utils';
+import { getNumberOfDays, getDaysOfYear } from './../../../utils/utils';
 import Month from './../Month/Month';
 import Day from './../Day/Day';
 import Events from './../Events/Events';
@@ -13,20 +12,20 @@ import styles from './Year.css';
 const Year = ({
   year,
   mode,
-  eventLines,
+  eventRows,
   monthlyDayWidth,
   weeklyDayWidth,
-  size,
   games,
-  changeScale
+  changeScale,
+  getEventRows
 }) => {
   const renderMonths = () => Array.apply([], Array(12)).map((v, month) => ((
-    <Month year={year} month={month} mode={mode}>
+    <Month key={month} year={year} month={month} mode={mode}>
       {mode === 'year' ?
         (<EventButton
           mode={mode}
           games={games[year] ? games[year] : []}
-          eventLines={eventLines}
+          eventRows={eventRows}
           changeScale={changeScale}
           year={year}
           month={month}
@@ -50,7 +49,7 @@ const Year = ({
           index={index}
           monthlyDayWidth={monthlyDayWidth}
           weeklyDayWidth={weeklyDayWidth}
-          eventLines={eventLines}
+          eventRows={eventRows}
         >
           {d + 1}
         </Day>
@@ -59,15 +58,39 @@ const Year = ({
   };
 
   const renderEventsLayer = () => {
-    if (mode === 'year') return undefined;
+    const num = getDaysOfYear(year);
+    let width; let unit;
+
+    switch (mode) {
+      case 'month':
+        width = parseFloat(((num * (monthlyDayWidth + 2)) - 3.7).toFixed(2), 10);
+        unit = (monthlyDayWidth + 2) / 24;
+        break;
+      case 'week':
+        width = parseFloat(((num * (weeklyDayWidth + 2)) - 2.55).toFixed(2), 10);
+        unit = (weeklyDayWidth + 2) / 24;
+        break;
+      default:
+        return undefined;
+    }
 
     return (
-      <Events width={size.width} mode={mode} games={games[year] ? games[year] : []} year={year} />
+      <Events
+        width={width}
+        mode={mode}
+        games={games[year] ? games[year] : []}
+        year={year}
+        unit={unit}
+        getEventRows={rows => getEventRows(rows)}
+      />
     );
   };
 
   return (
-    <div key={year} className={styles.Year}>
+    <div
+      className={styles.Year}
+      // style={{ height: !eventRows ? (84 + 4 + 27) : (84 + 4 + (eventLines * 27)) }}
+    >
       <div>{year}</div>
       <div>{renderMonths()}</div>
       {renderEventsLayer()}
@@ -76,19 +99,18 @@ const Year = ({
 };
 
 Year.propTypes = {
-  size: PropTypes.shape(),
   year: PropTypes.number.isRequired,
   mode: PropTypes.string.isRequired,
-  eventLines: PropTypes.number.isRequired,
+  eventRows: PropTypes.number.isRequired,
   monthlyDayWidth: PropTypes.number.isRequired,
   weeklyDayWidth: PropTypes.number.isRequired,
   games: PropTypes.shape(),
-  changeScale: PropTypes.func.isRequired
+  changeScale: PropTypes.func.isRequired,
+  getEventRows: PropTypes.func.isRequired
 };
 
 Year.defaultProps = {
-  size: { width: 0 },
   games: {}
 };
 
-export default sizeMe()(Year);
+export default Year;

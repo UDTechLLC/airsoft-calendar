@@ -15,7 +15,7 @@ class Homepage extends Component {
     year: undefined,
     month: undefined,
     visualMonth: undefined,
-    mode: 'year'
+    mode: 'month'
   };
 
   componentWillMount() {
@@ -38,7 +38,6 @@ class Homepage extends Component {
   render() {
     const { games } = this.props;
     const { mode, year, month, visualMonth } = this.state;
-    // console.log(games);
 
     return (
       <div>

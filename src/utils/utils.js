@@ -23,6 +23,7 @@ const splitEventsArray = array => {
 
   for (let i = 0; i < firstArray.length; i += 1) {
     const item = firstArray[i];
+
     // eslint-disable-next-line no-loop-func
     const partition = _.partition(firstArray, o => {
       const j = firstArray.indexOf(o);
@@ -31,6 +32,7 @@ const splitEventsArray = array => {
         (o.date_end >= item.date_start && o.date_end <= item.date_end)
       );
     });
+
     firstArray = partition[1];
     secondArray = _.uniq([...secondArray, ...partition[0]]);
   }

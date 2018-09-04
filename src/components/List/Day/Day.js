@@ -5,18 +5,23 @@ import { DAY_NAMES } from './../../../utils/const';
 
 import styles from './Day.css';
 
-const Day = ({ weekend, mode, index, monthlyDayWidth, weeklyDayWidth, eventLines, children }) => (
+const Day = ({ weekend, mode, index, monthlyDayWidth, weeklyDayWidth, eventRows, children }) => (
   <div
     className={[
       styles.Day,
       weekend ? styles.Weekend : undefined
     ].join(' ')}
+    style={{
+      width: mode !== 'week' ? (monthlyDayWidth + 2) : (weeklyDayWidth + 2)
+    }}
   >
-    <div>{mode !== 'week' ? DAY_NAMES[index].substr(0, 3) : DAY_NAMES[index]}</div>
+    <div style={{ width: mode !== 'week' ? monthlyDayWidth : weeklyDayWidth }}>
+      {mode !== 'week' ? DAY_NAMES[index].substr(0, 3) : DAY_NAMES[index]}
+    </div>
     <div
       style={{
         width: mode !== 'week' ? monthlyDayWidth : weeklyDayWidth,
-        height: !eventLines ? 27 : eventLines * 27
+        height: !eventRows ? 27 : eventRows * 27
       }}
     >
       {children}
@@ -30,7 +35,7 @@ Day.propTypes = {
   index: PropTypes.number.isRequired,
   monthlyDayWidth: PropTypes.number.isRequired,
   weeklyDayWidth: PropTypes.number.isRequired,
-  eventLines: PropTypes.number.isRequired,
+  eventRows: PropTypes.number.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.string,
