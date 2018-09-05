@@ -11,11 +11,9 @@ class Homepage extends Component {
     scrollProgress: undefined
   };
 
-  handleChangeMode = mode => this.setState({ mode });
-
-  handleChangeTimeScale = (mode = undefined) => this.setState({
-    mode: !mode ? this.state.mode : mode
-  });
+  handleChangeMode = (mode, cb = () => undefined) => {
+    this.setState({ mode: mode || this.state.mode }, cb());
+  };
 
   handleCheckScrollProgress = scrollProgress => {
     const { games } = this.props;
@@ -36,7 +34,7 @@ class Homepage extends Component {
           mode={mode}
           scrollProgress={scrollProgress}
           games={games}
-          changeScale={this.handleChangeTimeScale}
+          changeScale={this.handleChangeMode}
           onScrollProgress={this.handleCheckScrollProgress}
         />
       </div>

@@ -11,8 +11,10 @@ import EventButton from './../EventButton/EventButton';
 import styles from './Year.css';
 
 class Year extends Component {
+  componentWillMount() { this.props.scrollTo(); }
+
   renderMonths = () => {
-    const { year, mode, games, eventRows, changeScale } = this.props;
+    const { year, mode, games, eventRows, onEventButtonClick } = this.props;
 
     return Array.apply([], Array(12)).map((v, month) => ((
       <Month key={month} year={year} month={month} mode={mode}>
@@ -21,7 +23,7 @@ class Year extends Component {
             mode={mode}
             games={games[year] ? games[year] : []}
             eventRows={eventRows}
-            changeScale={changeScale}
+            onEventButtonClick={onEventButtonClick}
             year={year}
             month={month}
           />) :
@@ -108,8 +110,9 @@ Year.propTypes = {
   monthlyDayWidth: PropTypes.number.isRequired,
   weeklyDayWidth: PropTypes.number.isRequired,
   games: PropTypes.shape(),
-  changeScale: PropTypes.func.isRequired,
-  getEventRows: PropTypes.func.isRequired
+  onEventButtonClick: PropTypes.func.isRequired,
+  getEventRows: PropTypes.func.isRequired,
+  scrollTo: PropTypes.func.isRequired
 };
 
 Year.defaultProps = {

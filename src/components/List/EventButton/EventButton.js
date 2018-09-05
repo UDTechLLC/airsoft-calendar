@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import styles from './EventButton.css';
 
-const EventButton = ({ mode, games, changeScale, eventRows, year, month }) => {
+const EventButton = ({ mode, games, onEventButtonClick, eventRows, year, month }) => {
   const timestamp = {
     start: new Date(year, month, 1).getTime(),
     end: new Date(year, month + 1, 0).getTime()
@@ -24,7 +24,7 @@ const EventButton = ({ mode, games, changeScale, eventRows, year, month }) => {
       <button
         type="button"
         className={styles.EventCircle}
-        onClick={() => changeScale(year, month, mode === 'year' ? 'month' : 'week')}
+        onClick={() => onEventButtonClick(new Date(year, month), mode === 'year' ? 'month' : 'week')}
       >
         {events.length}
       </button>
@@ -35,7 +35,7 @@ const EventButton = ({ mode, games, changeScale, eventRows, year, month }) => {
 EventButton.propTypes = {
   mode: PropTypes.string.isRequired,
   games: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  changeScale: PropTypes.func.isRequired,
+  onEventButtonClick: PropTypes.func.isRequired,
   eventRows: PropTypes.number.isRequired,
   year: PropTypes.number.isRequired,
   month: PropTypes.number.isRequired

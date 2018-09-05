@@ -9,6 +9,8 @@ import styles from './List.css';
 
 class List extends Component {
   state = {
+    date: new Date(),
+    lastDate: undefined,
     monthlyDayWidth: parseFloat(((this.props.size.width - 62) / 31).toFixed(2), 10),
     weeklyDayWidth: parseFloat(((this.props.size.width - 14) / 7).toFixed(2), 10)
   };
@@ -16,62 +18,90 @@ class List extends Component {
   componentDidUpdate() {
     const { scrollProgress } = this.props;
     const listFullWidth = this.instance.scrollWidth;
+    // TODO: write for year auto scroll function
+    // if (mode === 'year') {
+    //   return;
+    // }
     this.instance.scrollLeft = listFullWidth * scrollProgress;
   }
 
-  scrollList = () => {
-    const { mode, size, scrollProgress } = this.props;
-    const { monthlyDayWidth, weeklyDayWidth } = this.state;
+  handleScrollTo = (date = undefined) => {
+    const { onScrollProgress } = this.props;
 
-    //  if default position
-    const today = new Date();
-    const thisYear = today.getFullYear();
+    this.scrollList((date || new Date()), scrollLeft => {
+      setTimeout(() => {
+        const scrollProgress = scrollLeft / this.instance.scrollWidth;
+
+        return onScrollProgress(scrollProgress);
+      }, 0);
+    });
+  };
+
+  scrollList = (date, callback = () => undefined) => {
+    const { mode, size } = this.props;
+    const { monthlyDayWidth, weeklyDayWidth } = this.state;
+    const thisYear = date.getFullYear();
 
     //  if there is no data ref or th list was scrolled
-    if (!this[`year_${thisYear}`] || scrollProgress) return;
+    if (!this[`year_${thisYear}`] || !date) return;
 
     //  if this year have rendered
     const thisYearDOM = this[`year_${thisYear}`].domEl;
     const thisYearInitialX = thisYearDOM.offsetLeft;
+    let result;
 
     if (mode === 'year') {
-      const thisMonth = today.getMonth();
+      const thisMonth = date.getMonth();
 
       const yearWidth = thisYearDOM.clientWidth;
       const monthWidth = yearWidth / 12;
 
-      this.instance.scrollLeft = (thisYearInitialX + ((thisMonth + 0.5) * monthWidth))
+      result = (thisYearInitialX + ((thisMonth + 0.5) * monthWidth))
         - (size.width / 2);
-      return;
+    } else {
+      const thisYearStart = new Date(thisYear, 0, 0);
+      const diff = date - thisYearStart;
+      const oneDay = 1000 * 60 * 60 * 24;
+      const dayOfYear = Math.floor(diff / oneDay);
+
+      const dayWidth = mode === 'week' ? (weeklyDayWidth + 2) : (monthlyDayWidth + 2);
+
+      result = (thisYearInitialX + (dayOfYear * dayWidth))
+        - ((size.width / 2) + (1.5 * dayWidth));
     }
 
-    const thisYearStart = new Date(thisYear, 0, 0);
-    const diff = today - thisYearStart;
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
-
-    const dayWidth = mode === 'week' ? (weeklyDayWidth + 2) : (monthlyDayWidth + 2);
-
-    this.instance.scrollLeft = (thisYearInitialX + (dayOfYear * dayWidth))
-      - ((size.width / 2) + (1.5 * dayWidth));
+    this.instance.scrollLeft = result;
+    return this.setState({ date }, callback(result));
   };
 
   handleScroll = () => {
+    const { date, lastDate } = this.state;
     const { onScrollProgress } = this.props;
 
     const listFullWidth = this.instance.scrollWidth;
-    // const middleIs = this.instance.scrollLeft + (this.props.size.width / 2);
     const scrollProgress = this.instance.scrollLeft / listFullWidth;
 
-    onScrollProgress(scrollProgress);
+    if (date !== lastDate) {
+      onScrollProgress(scrollProgress);
+    }
   };
 
   onMouseWheel = e => {
-    this.instance.scrollLeft = this.instance.scrollLeft + e.deltaY;
+    const listFullWidth = this.instance.scrollWidth;
+    const { scrollProgress } = this.props;
+    this.instance.scrollLeft = (listFullWidth * scrollProgress) + e.deltaY;
+  };
+
+  handleEventButtonClick = (date, mode) => {
+    const { changeScale } = this.props;
+
+    changeScale(mode, () => this.setState({ lastDate: this.state.date }, () => (
+      this.handleScrollTo(date)
+    )));
   };
 
   renderContent = () => {
-    const { games, mode, changeScale } = this.props;
+    const { games, mode } = this.props;
     const { monthlyDayWidth, weeklyDayWidth } = this.state;
 
     if (games === null) return <div />;
@@ -85,7 +115,7 @@ class List extends Component {
     }).map(k => this.state[k]);
 
     //  16.67 ms -> 60fps
-    setTimeout(this.scrollList, 8.34);
+    // setTimeout(this.handleScrollToDefault, 8.34);
 
     return years.map((year, i) => (
       <Year
@@ -97,10 +127,11 @@ class List extends Component {
         monthlyDayWidth={monthlyDayWidth}
         weeklyDayWidth={weeklyDayWidth}
         games={games}
-        changeScale={changeScale}
         getEventRows={(key, rows) => {
          this.setState({ [`event_rows->${key}`]: rows });
         }}
+        scrollTo={this.handleScrollTo}
+        onEventButtonClick={this.handleEventButtonClick}
       />
     ));
   };
