@@ -1,56 +1,43 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import _ from 'lodash';
 
-import { MONTH_NAMES } from './../../utils/const';
 import Header from './../../components/Header/Header';
 import List from './../../components/List/List';
 
-// import styles from './Homepage.css';
-
 class Homepage extends Component {
   state = {
-    // today: undefined,
-    year: undefined,
-    month: undefined,
-    visualMonth: undefined,
-    mode: 'month'
+    mode: 'week',
+    scrollProgress: undefined
   };
-
-  componentWillMount() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    this.setState({ year, month });
-  }
 
   handleChangeMode = mode => this.setState({ mode });
 
-  handleChangeTimeScale = (year, month, mode = undefined) => this.setState({
-    year,
-    month,
+  handleChangeTimeScale = (mode = undefined) => this.setState({
     mode: !mode ? this.state.mode : mode
   });
 
-  handleChangeVisualMonth = visualMonth => this.setState({ visualMonth });
+  handleCheckScrollProgress = scrollProgress => {
+    const { games } = this.props;
+
+    if (!games || !Object.keys(games).length) return;
+
+    this.setState({ scrollProgress });
+  };
 
   render() {
     const { games } = this.props;
-    const { mode, year, month, visualMonth } = this.state;
+    const { mode, scrollProgress } = this.state;
 
     return (
       <div>
-        <Header
-          changeMode={this.handleChangeMode}
-          month={_.isNumber(visualMonth) ? MONTH_NAMES[visualMonth] : MONTH_NAMES[month]}
-          {...{ mode, year }}
-        />
+        <Header mode={mode} changeMode={this.handleChangeMode} />
         <List
-          changeScale={this.handleChangeTimeScale}
-          changeVisualMonth={this.handleChangeVisualMonth}
+          mode={mode}
+          scrollProgress={scrollProgress}
           games={games}
-          {...{ mode, year, month }}
+          changeScale={this.handleChangeTimeScale}
+          onScrollProgress={this.handleCheckScrollProgress}
         />
       </div>
     );
@@ -66,7 +53,7 @@ Homepage.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  games: state.games.games
+  games: state.data.games
 });
 
 export default connect(mapStateToProps)(Homepage);

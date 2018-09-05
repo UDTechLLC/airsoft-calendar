@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 import sizeMe from 'react-sizeme';
 import _ from 'lodash';
 
@@ -14,30 +13,61 @@ class List extends Component {
     weeklyDayWidth: parseFloat(((this.props.size.width - 14) / 7).toFixed(2), 10)
   };
 
-  getDom = refname => ReactDOM.findDOMNode(this[refname]).getBoundingClientRect();
+  componentDidUpdate() {
+    const { scrollProgress } = this.props;
+    const listFullWidth = this.instance.scrollWidth;
+    this.instance.scrollLeft = listFullWidth * scrollProgress;
+  }
 
-  handleScrollInstance = () => {
-    const { size, changeVisualMonth } = this.props;
+  scrollList = () => {
+    const { mode, size, scrollProgress } = this.props;
+    const { monthlyDayWidth, weeklyDayWidth } = this.state;
 
-    const start = 0;
-    const middle = start + (size.width / 2);
-    const end = start + size.width;
+    //  if default position
+    const today = new Date();
+    const thisYear = today.getFullYear();
 
-    if (!this.month_0 && !this.month_11) return undefined;
+    //  if there is no data ref or th list was scrolled
+    if (!this[`year_${thisYear}`] || scrollProgress) return;
 
-    const month = Array.apply([], Array(12)).map((v, i) => {
-      const dom = this.getDom(`month_${i}`);
-      const mStart = dom.x;
-      const mEnd = dom.x + dom.width;
+    //  if this year have rendered
+    const thisYearDOM = this[`year_${thisYear}`].domEl;
+    const thisYearInitialX = thisYearDOM.offsetLeft;
 
-      if ((mStart > start && mStart < middle) || (mEnd <= end && mEnd > middle)) return i;
+    if (mode === 'year') {
+      const thisMonth = today.getMonth();
 
-      return undefined;
-    });
+      const yearWidth = thisYearDOM.clientWidth;
+      const monthWidth = yearWidth / 12;
 
-    const currentMonth = _.filter(month, _.isNumber)[0] || 0;
+      this.instance.scrollLeft = (thisYearInitialX + ((thisMonth + 0.5) * monthWidth))
+        - (size.width / 2);
+      return;
+    }
 
-    changeVisualMonth(currentMonth);
+    const thisYearStart = new Date(thisYear, 0, 0);
+    const diff = today - thisYearStart;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    const dayWidth = mode === 'week' ? (weeklyDayWidth + 2) : (monthlyDayWidth + 2);
+
+    this.instance.scrollLeft = (thisYearInitialX + (dayOfYear * dayWidth))
+      - ((size.width / 2) + (1.5 * dayWidth));
+  };
+
+  handleScroll = () => {
+    const { onScrollProgress } = this.props;
+
+    const listFullWidth = this.instance.scrollWidth;
+    // const middleIs = this.instance.scrollLeft + (this.props.size.width / 2);
+    const scrollProgress = this.instance.scrollLeft / listFullWidth;
+
+    onScrollProgress(scrollProgress);
+  };
+
+  onMouseWheel = e => {
+    this.instance.scrollLeft = this.instance.scrollLeft + e.deltaY;
   };
 
   renderContent = () => {
@@ -54,8 +84,12 @@ class List extends Component {
       return pos >= 0 ? k.substr(0, pos + 12) : false;
     }).map(k => this.state[k]);
 
+    //  16.67 ms -> 60fps
+    setTimeout(this.scrollList, 8.34);
+
     return years.map((year, i) => (
       <Year
+        ref={el => { this[`year_${year}`] = el; }}
         key={i}
         year={parseInt(year, 10)}
         mode={mode}
@@ -71,16 +105,12 @@ class List extends Component {
     ));
   };
 
-  onMouseWheel = e => {
-    this.instance.scrollLeft = this.instance.scrollLeft + e.deltaY;
-  };
-
   render() {
     return (
       <div
         ref={el => { this.instance = el; }}
         className={styles.Wrapper}
-        onScroll={e => this.handleScrollInstance(e)}
+        onScroll={e => this.handleScroll(e)}
         onWheel={e => this.onMouseWheel(e)}
       >
         {this.renderContent()}
@@ -94,10 +124,12 @@ List.propTypes = {
   mode: PropTypes.string.isRequired,
   games: PropTypes.shape(),
   changeScale: PropTypes.func.isRequired,
-  changeVisualMonth: PropTypes.func.isRequired
+  scrollProgress: PropTypes.number,
+  onScrollProgress: PropTypes.func.isRequired
 };
 
 List.defaultProps = {
+  scrollProgress: null,
   games: null
 };
 

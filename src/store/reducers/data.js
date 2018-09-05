@@ -10,12 +10,12 @@ const initialState = {
 const actionStart = state => updateObject(state, { loading: true });
 
 const actionFail = (state, { payload }) => updateObject(state, {
-  error: payload.error,
+  ...payload,
   loading: false
 });
 
 const getGamesSuccess = (state, { payload }) => updateObject(state, {
-  games: payload.games,
+  ...payload,
   error: null,
   loading: false
 });

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import sizeMe from 'react-sizeme';
 
 import { getNumberOfDays, getDaysOfYear } from './../../../utils/utils';
 import Month from './../Month/Month';
@@ -9,32 +10,29 @@ import EventButton from './../EventButton/EventButton';
 
 import styles from './Year.css';
 
-const Year = ({
-  year,
-  mode,
-  eventRows,
-  monthlyDayWidth,
-  weeklyDayWidth,
-  games,
-  changeScale,
-  getEventRows
-}) => {
-  const renderMonths = () => Array.apply([], Array(12)).map((v, month) => ((
-    <Month key={month} year={year} month={month} mode={mode}>
-      {mode === 'year' ?
-        (<EventButton
-          mode={mode}
-          games={games[year] ? games[year] : []}
-          eventRows={eventRows}
-          changeScale={changeScale}
-          year={year}
-          month={month}
-        />) :
-        renderDays(month)}
-    </Month>
-  )));
+class Year extends Component {
+  renderMonths = () => {
+    const { year, mode, games, eventRows, changeScale } = this.props;
 
-  const renderDays = month => {
+    return Array.apply([], Array(12)).map((v, month) => ((
+      <Month key={month} year={year} month={month} mode={mode}>
+        {mode === 'year' ?
+          (<EventButton
+            mode={mode}
+            games={games[year] ? games[year] : []}
+            eventRows={eventRows}
+            changeScale={changeScale}
+            year={year}
+            month={month}
+          />) :
+          this.renderDays(month)}
+      </Month>
+    )));
+  };
+
+  renderDays = month => {
+    const { year, mode, monthlyDayWidth, weeklyDayWidth, eventRows } = this.props;
+
     const num = getNumberOfDays(year, month);
     const day = d => new Date(year, month, d + 1).getDay();
 
@@ -57,7 +55,9 @@ const Year = ({
     });
   };
 
-  const renderEventsLayer = () => {
+  renderEventsLayer = () => {
+    const { year, mode, monthlyDayWidth, weeklyDayWidth, games, getEventRows } = this.props;
+
     const num = getDaysOfYear(year);
     let width; let unit;
 
@@ -86,19 +86,22 @@ const Year = ({
     );
   };
 
-  return (
-    <div
-      className={styles.Year}
-      // style={{ height: !eventRows ? (84 + 4 + 27) : (84 + 4 + (eventLines * 27)) }}
-    >
-      <div>{year}</div>
-      <div>{renderMonths()}</div>
-      {renderEventsLayer()}
-    </div>
-  );
-};
+  render() {
+    const { year } = this.props;
+
+    return (
+      <div className={styles.Year}>
+        <div>{year}</div>
+        <div>{this.renderMonths()}</div>
+        {this.renderEventsLayer()}
+      </div>
+    );
+  }
+}
 
 Year.propTypes = {
+  // eslint-disable-next-line react/no-unused-prop-types
+  size: PropTypes.shape(),
   year: PropTypes.number.isRequired,
   mode: PropTypes.string.isRequired,
   eventRows: PropTypes.number.isRequired,
@@ -110,7 +113,8 @@ Year.propTypes = {
 };
 
 Year.defaultProps = {
+  size: {},
   games: {}
 };
 
-export default Year;
+export default sizeMe()(Year);

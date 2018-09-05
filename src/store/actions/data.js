@@ -4,9 +4,9 @@ import * as actionTypes from './actionTypes';
 
 const getGamesStart = () => ({ type: actionTypes.GET_GAMES_START });
 
-const getGamesSuccess = games => ({
+const getGamesSuccess = data => ({
   type: actionTypes.GET_GAMES_SUCCESS,
-  payload: { games }
+  payload: { ...data }
 });
 
 const getGamesFail = error => ({
