@@ -5,7 +5,7 @@ import styles from './EventObject.css';
 
 const EventObject = ({ style, event }) => {
   const getHM = timestamp => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp * 1000);
     const h = date.getHours() > 9 ? date.getHours() : `0${date.getHours()}`;
     const m = date.getMinutes() > 9 ? date.getMinutes() : `0${date.getMinutes()}`;
     return `${h}:${m}`;

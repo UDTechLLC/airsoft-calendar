@@ -12,8 +12,26 @@
   border-bottom: 2px solid #393939;
   border-right: 2px solid #393939;
   box-sizing: border-box;
+  position: relative;
+}
+
+.Year > div:first-of-type > span {
+  position: absolute;
+  top: 0;
+  display: block;
 }
 
 .Year:last-of-type > div:first-of-type  {
   border-right: none;
+}
+
+.DateNumber {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 2;
+}
+
+.DateContent {
+  z-index: 0;
 }

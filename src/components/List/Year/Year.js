@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import sizeMe from 'react-sizeme';
+import uuidv4 from 'uuid/v4';
 
 import { getNumberOfDays, getDaysOfYear } from './../../../utils/utils';
 import Month from './../Month/Month';
@@ -11,29 +12,82 @@ import EventButton from './../EventButton/EventButton';
 import styles from './Year.css';
 
 class Year extends Component {
-  componentWillMount() { this.props.scrollTo(); }
+  state = { yearLabelId: uuidv4() };
 
-  renderMonths = () => {
+  componentDidMount() {
+    this.props.scrollTo();
+    const { year, detectYearsCoords } = this.props;
+    const { yearLabelId } = this.state;
+
+    detectYearsCoords({
+      year,
+      start: this[yearLabelId].offsetLeft,
+      end: this[yearLabelId].offsetLeft + this[yearLabelId].offsetWidth
+    });
+  }
+
+  // centerMe = () => {
+  //   const { caseMiddle } = this.props;
+  //   const { yearLabelId } = this.state;
+  //   const ref = this[yearLabelId];
+  //
+  //   // if (!containerObj || !parentObj.domEl || !ref || !ref.children.length) return;
+  //   //
+  //   // const container = containerObj;
+  //   // const parent = parentObj.domEl;
+  //   //
+  //   // const result = container.scrollLeft >= parent.offsetLeft + (container.offsetWidth / 2) ||
+  //   //   container.scrollLeft <= (parent.offsetLeft + parent.offsetWidth) -
+  //   //     (container.offsetWidth / 2) ?
+  //   //   (container.scrollLeft - parent.offsetLeft) + (container.offsetWidth / 2)
+  //   //   : 0;
+  //   if (!caseMiddle || !ref || !ref.children.length) return 0;
+  //   console.log(caseMiddle);
+  //   return caseMiddle;
+  //
+  //
+  //   // const result = containerObj.domEl.offsetLeft +
+  //   //   ((containerWidth / 2) - (ref.children[0].scrollWidth / 2));
+  //   // console.log(containerScrollLeft.domEl.offsetLeft);
+  //   // console.log(result);
+  //   // return result;
+  // };
+
+  renderMonths = () => Array.apply([], Array(12)).map((v, month) => this.renderMonth(month));
+
+  renderMonth = month => {
     const { year, mode, games, eventRows, onEventButtonClick } = this.props;
 
-    return Array.apply([], Array(12)).map((v, month) => ((
+    const button = (
+      <EventButton
+        mode={mode}
+        games={games[year] ? games[year] : []}
+        eventRows={eventRows}
+        onEventButtonClick={onEventButtonClick}
+        year={year}
+        month={month}
+        // scrollTo={scrollTo}
+      />
+    );
+
+    let days;
+    if (mode !== 'year') days = this.renderDays(month, button);
+
+    return (
       <Month key={month} year={year} month={month} mode={mode}>
-        {mode === 'year' ?
-          (<EventButton
-            mode={mode}
-            games={games[year] ? games[year] : []}
-            eventRows={eventRows}
-            onEventButtonClick={onEventButtonClick}
-            year={year}
-            month={month}
-          />) :
-          this.renderDays(month)}
+        {days || button}
       </Month>
-    )));
+    );
   };
 
-  renderDays = month => {
-    const { year, mode, monthlyDayWidth, weeklyDayWidth, eventRows } = this.props;
+  renderDays = (month, content = undefined) => {
+    const {
+      year,
+      mode,
+      monthlyDayWidth,
+      weeklyDayWidth,
+      eventRows
+    } = this.props;
 
     const num = getNumberOfDays(year, month);
     const day = d => new Date(year, month, d + 1).getDay();
@@ -51,7 +105,8 @@ class Year extends Component {
           weeklyDayWidth={weeklyDayWidth}
           eventRows={eventRows}
         >
-          {d + 1}
+          <div className={styles.DateNumber}>{d + 1}</div>
+          {content ? <div className={styles.DateContent}>{content}</div> : undefined}
         </Day>
       );
     });
@@ -90,10 +145,14 @@ class Year extends Component {
 
   render() {
     const { year } = this.props;
+    const { yearLabelId } = this.state;
+    // this.centerMe();
 
     return (
-      <div className={styles.Year}>
-        <div>{year}</div>
+      <div ref={el => { this[yearLabelId] = el; }} className={styles.Year}>
+        <div>
+          <span>{year}</span>
+        </div>
         <div>{this.renderMonths()}</div>
         {this.renderEventsLayer()}
       </div>
@@ -112,12 +171,19 @@ Year.propTypes = {
   games: PropTypes.shape(),
   onEventButtonClick: PropTypes.func.isRequired,
   getEventRows: PropTypes.func.isRequired,
-  scrollTo: PropTypes.func.isRequired
+  detectYearsCoords: PropTypes.func.isRequired,
+  scrollTo: PropTypes.func.isRequired,
+  // containerObj: PropTypes.shape(),
+  // parentObj: PropTypes.shape(),
+  // caseMiddle: PropTypes.number
 };
 
 Year.defaultProps = {
   size: {},
-  games: {}
+  games: {},
+  // containerObj: {},
+  // parentObj: {}
+  // caseMiddle: undefined
 };
 
 export default sizeMe()(Year);

@@ -13,6 +13,8 @@
 }
 
 .Day > div:nth-of-type(2) {
+  position: relative;
+  padding: 0.4rem;
   justify-content: flex-end;
 }
 

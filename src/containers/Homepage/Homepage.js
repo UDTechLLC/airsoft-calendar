@@ -19,7 +19,7 @@ class Homepage extends Component {
     const { games } = this.props;
 
     if (!games || !Object.keys(games).length) return;
-
+    // console.log('scrollProgress');
     this.setState({ scrollProgress });
   };
 
