@@ -17,6 +17,8 @@ const getDaysOfYear = year => (isLeapYear(year) ? 366 : 365);
 
 const isLeapYear = year => year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0);
 
+const getDayOfWeek = (y, m, d) => new Date(y, m, d).getDay();
+
 const splitEventsArray = array => {
   let firstArray = [...array];
   let secondArray = [];
@@ -59,6 +61,7 @@ export {
   getNumberOfDays,
   getHoursFromTimestamps,
   getDaysOfYear,
+  getDayOfWeek,
   isLeapYear,
   splitEventsArray,
   splitLoop

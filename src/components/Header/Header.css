@@ -1,5 +1,6 @@
-.Wrapper,
-.Wrapper > div {
+.Top,
+.Top > div,
+.Bottom {
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -8,13 +9,17 @@
   color: white;
 }
 
-.Wrapper > div:nth-of-type(2) {
+.Top > div:nth-of-type(2) {
   flex: 2;
   justify-content: center;
   font-size: 2rem;
   font-weight: 700;
 }
 
-.Wrapper > div:nth-of-type(3) {
+.Top > div:nth-of-type(3) {
   justify-content: flex-end;
+}
+
+.Bottom {
+  justify-content: space-between;
 }

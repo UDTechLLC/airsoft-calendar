@@ -38,11 +38,12 @@
   overflow-x: auto;
   background-color: #393939;
   color: #fff;
+  position: relative;
 }
 
-.Wrapper::-webkit-scrollbar {
-  display: none;
-}
+/*.Wrapper::-webkit-scrollbar {*/
+  /*display: none;*/
+/*}*/
 
 .Wrapper div {
   display: flex;

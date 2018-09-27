@@ -1,6 +1,5 @@
-export const APP_NAME = 'suncoin';
-export const BASE_URL = 'http://localhost';
-export const API_URL = `${BASE_URL}:3000`;
+export const BASE_URL = 'https://stage.airsoftorg.com';
+export const API_URL = `${BASE_URL}/api/web/v1/game/calendar`;
 
 export const MONTH_NAMES = [
   'January',

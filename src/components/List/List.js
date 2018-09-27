@@ -241,6 +241,7 @@ class List extends Component {
 
   render() {
     console.log(this.detectYear(this.detectCenterScroll()));
+
     return (
       <div
         ref={el => { this.instance = el; }}
@@ -248,6 +249,22 @@ class List extends Component {
         onScroll={e => this.handleScroll(e)}
         onWheel={e => this.onMouseWheel(e)}
       >
+        {
+          process.env.NODE_ENV === 'development' ?
+          (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: this.detectCenterScroll(),
+                bottom: 0,
+                width: 1,
+                backgroundColor: 'yellow'
+              }}
+            />
+          ) :
+          undefined
+        }
         {this.renderContent()}
       </div>
     );
