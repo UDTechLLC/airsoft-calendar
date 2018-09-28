@@ -2,4 +2,5 @@
   display: flex;
   flex: 1;
   position: relative;
+  outline: none;
 }

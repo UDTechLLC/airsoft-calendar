@@ -21,6 +21,9 @@ const EventObject = ({ style, event }) => {
         {/* <span>{event.name}</span> */}
         <span>{getHM(event.date_end)}</span>
       </div>
+      <div className={styles.HoverInfo}>
+        {Object.keys(event).map((k, i) => <p key={i}>{k}: {event[k]}</p>)}
+      </div>
     </div>
   );
 };

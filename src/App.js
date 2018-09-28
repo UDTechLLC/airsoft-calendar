@@ -2,36 +2,54 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import { API_URL } from './utils/const';
+import { filterGames } from './utils/utils';
 import { Container } from './components/common';
 import Header from './components/Header/Header';
 import Content from './components/Content/Content';
 
 class App extends Component {
   state = {
-    location: undefined,
     games: null,
+    userData: null,
     error: null,
     loading: false,
     mode: 'month',
+    filter: null,
     focusDate: new Date()
   };
 
   componentWillMount() {
-    this.handleFetchGames();
+    this.handleFetchGames(null, () => this.handleFetchUserData(() => {
+      this.setState({ loading: false });
+    }));
   }
 
-  handleFetchGames = (year = undefined) => {
-    const route = year ? `${API_URL}/${year}` : API_URL;
+  handleFetchGames = (year = undefined, cb = () => undefined) => {
+    this.setState({ loading: true });
+
+    const route = year ? `${API_URL}/game/calendar/${year}` : `${API_URL}/game/calendar`;
     const { games } = this.state;
 
-    this.setState({ loading: true }, () => axios.get(route)
+    return axios.get(route)
       .then(({ data }) => (
-        this.setState({ games: { ...games, ...data.games }, loading: false }, () => {
-          this.handleRemoveErrors();
+        this.setState({ games: { ...games, ...data.games } }, () => {
+          if (!year) return cb();
+
+          this.setState({ loading: false }, () => cb());
         })
       ))
-      .catch(({ response }) => this.setState({ error: response.message, loading: false })));
+      .catch(({ response }) => this.setState({ error: response.message }, () => cb()));
   };
+
+  handleFetchUserData = (cb = () => undefined) => {
+    const id = localStorage.getItem('airsoft-user-unique-id');
+
+    if (!id) return this.setState({ filter: 'world' }, () => cb());
+
+    return axios.get(`${API_URL}/user/get-place/${id}`)
+      .then(({ data }) => this.setState({ userData: data, filter: 'region' }, () => cb()))
+      .catch(({ response }) => this.setState({ error: response.message }, () => cb()));
+  }
 
   handleRemoveErrors = () => this.setState({ error: null, loading: false });
 
@@ -44,23 +62,15 @@ class App extends Component {
     const year = focusDate.getFullYear();
     const month = focusDate.getMonth();
     const date = focusDate.getDate();
-    // TODO: check this
+
     if (to === 'prev' && mode === 'year') {
       return this.setState({ focusDate: new Date(year - 1, month, date) }, () => {
         if (!games[year - 1]) {
           this.handleFetchGames(year - 1);
         }
       });
-    } else if (to === 'prev' && mode === 'month') {
-      const updMonth = month !== 0 ? month - 1 : 11;
-      const updYear = updMonth !== 11 ? year : year - 1;
-      return this.setState({ focusDate: new Date(updYear, updMonth, date) }, () => {
-        if (!games[updYear]) {
-          this.handleFetchGames(updYear);
-        }
-      });
-    } else if (to === 'prev' && mode === 'week') {
-      const updFocusDate = new Date(+new Date(year, month, date) - (1000 * 60 * 60 * 24));
+    } else if (to === 'prev') {
+      const updFocusDate = new Date(+focusDate - (1000 * 60 * 60 * 24));
       return this.setState({ focusDate: updFocusDate }, () => {
         if (!games[updFocusDate.getFullYear()]) {
           this.handleFetchGames(updFocusDate.getFullYear());
@@ -72,16 +82,8 @@ class App extends Component {
           this.handleFetchGames(year + 1);
         }
       });
-    } else if (to === 'next' && mode === 'month') {
-      const updMonth = month !== 11 ? month + 1 : 0;
-      const updYear = updMonth !== 0 ? year : year + 1;
-      return this.setState({ focusDate: new Date(updYear, updMonth, date) }, () => {
-        if (!games[updYear]) {
-          this.handleFetchGames(updYear);
-        }
-      });
-    } else if (to === 'next' && mode === 'week') {
-      const updFocusDate = new Date(+new Date(year, month, date) + (1000 * 60 * 60 * 24));
+    } else if (to === 'next') {
+      const updFocusDate = new Date(+focusDate + (1000 * 60 * 60 * 24));
       return this.setState({ focusDate: updFocusDate }, () => {
         if (!games[updFocusDate.getFullYear()]) {
           this.handleFetchGames(updFocusDate.getFullYear());
@@ -90,20 +92,24 @@ class App extends Component {
     }
   };
 
-  handleChangeFocusDateTo = focusDate => this.setState({ focusDate, mode: 'month' })
+  handleChangeFocusDateTo = (focusDate, mode = 'month') => this.setState({ focusDate, mode })
 
   render() {
-    const { mode } = this.state;
+    const { mode, games, error, userData, filter } = this.state;
+    if (error) console.log(error);
 
     return (
       <Container>
         <Header
+          filter={filter}
           mode={mode}
           changeMode={this.handleChangeMode}
           onManipulationClick={to => this.handleManipulationBtnClick(to)}
+          onChangeFilter={f => this.setState({ filter: f })}
         />
         <Content
           {...this.state}
+          games={filterGames(games, filter, userData)}
           changeFocusDateTo={this.handleChangeFocusDateTo}
         />
       </Container>

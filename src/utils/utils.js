@@ -56,7 +56,7 @@ const splitLoop = gamesArr => {
   return array;
 };
 
-const getEvents = (events, from, to) => {
+const getEvents = (events, from, to, includeEndings = false) => {
   const timestamps = {
     start: new Date(from.year, from.month, from.date).getTime(),
     end: new Date(to.year, to.month, to.date).getTime()
@@ -66,10 +66,23 @@ const getEvents = (events, from, to) => {
     ? events[from.year]
     : [...events[from.year], ...events[to.year]];
 
-  const res = _.filter(prepEvents, o => (
-    o.date_start >= (timestamps.start / 1000) && o.date_start <= (timestamps.end / 1000)
+  return _.filter(prepEvents, o => {
+    if (!includeEndings) {
+      return o.date_start >= (timestamps.start / 1000) && o.date_start <= (timestamps.end / 1000);
+    }
+
+    return (o.date_start >= (timestamps.start / 1000) && o.date_start <= (timestamps.end / 1000)) ||
+      (o.date_end >= (timestamps.start / 1000) && o.date_end <= (timestamps.end / 1000)) ||
+      (o.date_start <= (timestamps.start / 1000) && o.date_end >= (timestamps.end / 1000));
+  });
+};
+
+const filterGames = (games, filter, userData) => {
+  if (filter === 'world' || !userData || !filter) return games;
+
+  return _.mapValues(games, (v, k) => (
+    _.filter(games[k], o => o[filter] === userData[filter])
   ));
-  return res;
 };
 
 export {
@@ -81,5 +94,6 @@ export {
   isLeapYear,
   splitEventsArray,
   splitLoop,
-  getEvents
+  getEvents,
+  filterGames
 };

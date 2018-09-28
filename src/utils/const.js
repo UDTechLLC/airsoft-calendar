@@ -1,5 +1,5 @@
 export const BASE_URL = 'https://stage.airsoftorg.com';
-export const API_URL = `${BASE_URL}/api/web/v1/game/calendar`;
+export const API_URL = `${BASE_URL}/api/web/v1`;
 
 export const MONTH_NAMES = [
   'January',

@@ -5,14 +5,34 @@ import { Button, Container } from './../common';
 
 import styles from './Header.css';
 
-const Header = ({ mode, changeMode, onManipulationClick }) => (
+const Header = ({ filter, mode, changeMode, onManipulationClick, onChangeFilter }) => (
   <Container>
     <div className={styles.Top}>
       <div>
-        <Button>City</Button>
-        <Button>Country</Button>
-        <Button>Region</Button>
-        <Button className="Active">World</Button>
+        <Button
+          className={filter !== 'city' ? undefined : 'Active'}
+          onClick={() => onChangeFilter('city')}
+        >
+          City
+        </Button>
+        <Button
+          className={filter !== 'country' ? undefined : 'Active'}
+          onClick={() => onChangeFilter('country')}
+        >
+          Country
+        </Button>
+        <Button
+          className={filter !== 'region' ? undefined : 'Active'}
+          onClick={() => onChangeFilter('region')}
+        >
+          Region
+        </Button>
+        <Button
+          className={filter !== 'world' ? undefined : 'Active'}
+          onClick={() => onChangeFilter('world')}
+        >
+          World
+        </Button>
       </div>
       <div />
       <div>
@@ -46,7 +66,13 @@ const Header = ({ mode, changeMode, onManipulationClick }) => (
 Header.propTypes = {
   mode: PropTypes.string.isRequired,
   changeMode: PropTypes.func.isRequired,
-  onManipulationClick: PropTypes.func.isRequired
+  onManipulationClick: PropTypes.func.isRequired,
+  filter: PropTypes.string,
+  onChangeFilter: PropTypes.func.isRequired
+};
+
+Header.defaultProps = {
+  filter: null
 };
 
 export default Header;

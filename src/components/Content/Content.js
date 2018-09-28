@@ -8,12 +8,12 @@ import Events from './../Events/Events';
 import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
 import { getNumberOfDays, getDayOfWeek, getEvents } from './../../utils/utils';
 
-const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
+const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo }) => {
   const focusYear = focusDate.getFullYear();
   const focusMonth = focusDate.getMonth();
   const focusDay = focusDate.getDate();
 
-  if (games === null || loading) {
+  if (games === null || loading || !filter) {
     return (
       <div className={styles.Wrapper}>
         <Spinner />
@@ -33,7 +33,7 @@ const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
         return (
           <Unit key={uuidv4()} label={MONTH_NAMES[month]}>
             <Button
-              onClick={() => changeFocusDateTo(new Date(focusYear, month))}
+              onClick={() => changeFocusDateTo(new Date(focusYear, month, 16))}
               className="Event"
             >
               {events.length}
@@ -43,86 +43,71 @@ const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
       });
     }
 
-    if (mode === 'month') {
-      const from = { year: focusYear, month: focusMonth, date: 1 };
-      const to = {
-        year: focusYear,
-        month: focusMonth !== 11 ? focusMonth + 1 : 0,
-        date: 0
-      };
-
-      return (
-        <Container row>
-          {renderDays()}
-          <Events
-            games={getEvents(games, from, to)}
-            from={from}
-            mode={mode}
-          />
-        </Container>
-      );
-    }
-
-    const from = {
-      year: focusYear,
-      month: focusMonth,
-      date: focusDay - 3
-    };
-    const to = {
-      year: focusYear,
-      month: focusMonth,
-      date: focusDay + 3
-    };
+    const { days, from, to } = getDays();
 
     return (
       <Container row>
-        {renderDays()}
-        <Events
-          games={getEvents(games, from, to)}
-          from={from}
-        />
+        {days}
+        <Events games={getEvents(games, from, to, true)} from={from} mode={mode} />
       </Container>
     );
   };
 
-  const renderDays = () => {
+  const getDays = () => {
+    let from = { year: focusYear, month: focusMonth, date: 1 };
+    let to = { year: focusYear, month: focusMonth !== 11 ? focusMonth + 1 : 0, date: 0 };
+
     const daysNumber = mode !== 'month' ? 7 : 31;
     const daysInMonth = getNumberOfDays(focusYear, focusMonth);
 
     const getData = (y, m, d) => {
-      const updDate = d <= daysInMonth ? d + 1 : (d - daysInMonth) + 1;
+      const updMonth = d <= daysInMonth ? focusMonth : m;
+      const updYear = d <= daysInMonth ? focusYear : y;
 
       if (mode === 'month') {
-        const label = DAY_NAMES[getDayOfWeek(focusYear, focusMonth, d + 1)].substr(0, 3);
-        return {
-          updDate,
-          updMonth: d <= daysInMonth ? focusMonth : m,
-          updYear: d <= daysInMonth ? focusYear : y,
-          label
-        };
+        const dayOfWeek = getDayOfWeek(focusYear, focusMonth, (focusDay - 15) + d);
+        const label = DAY_NAMES[dayOfWeek].substr(0, 3);
+
+        return { updDate: (focusDay - 15) + d, updMonth, updYear, label, dayOfWeek };
       }
 
-      const label = DAY_NAMES[getDayOfWeek(focusYear, focusMonth, (focusDay - 3) + d)];
-      return {
-        updDate: (focusDay - 3) + d,
-        updMonth: d <= daysInMonth ? focusMonth : m,
-        updYear: d <= daysInMonth ? focusYear : y,
-        label
-      };
+      const dayOfWeek = getDayOfWeek(focusYear, focusMonth, (focusDay - 3) + d);
+      const label = DAY_NAMES[dayOfWeek];
+
+      return { updDate: (focusDay - 3) + d, updMonth, updYear, label, dayOfWeek };
     };
 
-    return Array.apply([], Array(daysNumber)).map((v, d) => {
+    const days = Array.apply([], Array(daysNumber)).map((v, d) => {
       // case if newxt month will break year point
-      const prepMonth = focusMonth < 11 && d <= daysInMonth ? focusMonth + 1 : 0;
-      const prepYear = prepMonth !== 0 && d <= daysInMonth ? focusYear : focusYear + 1;
-      const { updDate, updMonth, updYear, label } = getData(prepYear, prepMonth, d);
+      const prepMonth = focusMonth === 11 && d >= daysInMonth ? 0 : focusMonth + 1;
+      const prepYear = prepMonth === 0 && d >= daysInMonth ? focusYear + 1 : focusYear;
+
+      const { updDate, updMonth, updYear, label, dayOfWeek } = getData(prepYear, prepMonth, d);
+
+      // detect start and final dots
+      if (d === 0) {
+        from = { year: updYear, month: updMonth, date: updDate };
+      } else if (d + 1 === daysNumber) {
+        to = { year: updYear, month: updMonth, date: updDate };
+      }
 
       return (
-        <Unit key={uuidv4()} label={label}>
+        <Unit
+          key={uuidv4()}
+          label={label}
+          weekend={dayOfWeek === 0 || dayOfWeek === 6}
+          onClick={() => (
+            mode === 'month'
+              ? changeFocusDateTo(new Date(updYear, updMonth, updDate), 'week')
+              : undefined
+          )}
+        >
           {new Date(updYear, updMonth, updDate).getDate()}
         </Unit>
       );
     });
+
+    return { days, from, to };
   };
 
   return (
@@ -139,11 +124,13 @@ Content.propTypes = {
   loading: PropTypes.bool.isRequired,
   mode: PropTypes.string.isRequired,
   focusDate: PropTypes.instanceOf(Date).isRequired,
-  changeFocusDateTo: PropTypes.func.isRequired
+  changeFocusDateTo: PropTypes.func.isRequired,
+  filter: PropTypes.string
 };
 
 Content.defaultProps = {
-  games: {}
+  games: {},
+  filter: null
 };
 
 export default Content;
