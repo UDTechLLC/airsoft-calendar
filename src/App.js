@@ -12,7 +12,7 @@ class App extends Component {
     games: null,
     error: null,
     loading: false,
-    mode: 'year',
+    mode: 'month',
     focusDate: new Date()
   };
 
