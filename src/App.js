@@ -94,12 +94,21 @@ class App extends Component {
 
   handleChangeFocusDateTo = (focusDate, mode = 'month') => this.setState({ focusDate, mode })
 
+  handleScrollInstance = e => {
+    const { focusDate } = this.state;
+
+    const daysFloat = Math.abs(e.deltaY) < 10 ? e.deltaY : e.deltaY / 100;
+    const date = focusDate.getDate() - parseInt(daysFloat, 10);
+
+    this.setState({ focusDate: new Date(focusDate.getFullYear(), focusDate.getMonth(), date) });
+  }
+
   render() {
     const { mode, games, error, userData, filter } = this.state;
     if (error) console.log(error);
 
     return (
-      <Container>
+      <Container onScroll={e => this.handleScrollInstance(e)}>
         <Header
           filter={filter}
           mode={mode}

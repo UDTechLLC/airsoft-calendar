@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import styles from './Container.css';
 
-const Container = ({ children, row, onClick }) => (
+const Container = ({ children, row, onClick, onScroll }) => (
   <div
     className={styles.Wrapper}
     style={{ flexDirection: !row ? 'column' : 'row' }}
@@ -11,6 +11,7 @@ const Container = ({ children, row, onClick }) => (
     onKeyPress={undefined}
     role="button"
     tabIndex="0"
+    onWheel={onScroll}
   >
     {children}
   </div>
@@ -22,13 +23,15 @@ Container.propTypes = {
     PropTypes.node
   ]),
   row: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  onScroll: PropTypes.func
 };
 
 Container.defaultProps = {
   children: undefined,
   row: false,
-  onClick: () => undefined
+  onClick: () => undefined,
+  onScroll: () => undefined
 };
 
 export { Container };
