@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
 
-import { splitEventsArray, splitLoop, getHoursFromTimestamps } from './../../utils/utils';
+import { getNumberOfDays, splitEventsArray, splitLoop, getHoursFromTimestamps } from './../../utils/utils';
 import EventObject from './EventObject/EventObject';
 
 import styles from './Events.css';
@@ -26,7 +26,7 @@ class Events extends Component {
     //  if there is no games
     if (!gamesArr[0].length) return undefined;
 
-    const days = mode === 'month' ? 31 : 7;
+    const days = mode === 'month' ? getNumberOfDays(from.year, from.month) : 7;
     const hourWidth = 100 / days / 24;
 
     const firstDay = new Date(from.year, from.month, from.date).getTime() / 1000;

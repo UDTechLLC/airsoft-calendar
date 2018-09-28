@@ -68,7 +68,7 @@ class App extends Component {
       });
     } else if (to === 'next' && mode === 'year') {
       return this.setState({ focusDate: new Date(year + 1, month, date) }, () => {
-        if (!games[year - 1]) {
+        if (!games[year + 1]) {
           this.handleFetchGames(year + 1);
         }
       });

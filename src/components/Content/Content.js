@@ -53,7 +53,7 @@ const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
                     key={uuidv4()}
                     label={DAY_NAMES[dayOfWeek].substr(0, 3)}
                   >
-                    {d + 1}
+                    {new Date(focusYear, focusMonth, d + 1).getDate()}
                   </Unit>
                 );
               })
@@ -88,7 +88,7 @@ const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
                     key={uuidv4()}
                     label={DAY_NAMES[dayOfWeek].substr(0, 3)}
                   >
-                    {(focusDay - 3) + d}
+                    {new Date(focusYear, focusMonth, (focusDay - 3) + d).getDate()}
                   </Unit>
                 );
               })
