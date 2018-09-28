@@ -12,7 +12,7 @@ class App extends Component {
     games: null,
     error: null,
     loading: false,
-    mode: 'week',
+    mode: 'year',
     focusDate: new Date()
   };
 
@@ -90,6 +90,8 @@ class App extends Component {
     }
   };
 
+  handleChangeFocusDateTo = focusDate => this.setState({ focusDate, mode: 'month' })
+
   render() {
     const { mode } = this.state;
 
@@ -100,7 +102,10 @@ class App extends Component {
           changeMode={this.handleChangeMode}
           onManipulationClick={to => this.handleManipulationBtnClick(to)}
         />
-        <Content {...this.state} />
+        <Content
+          {...this.state}
+          changeFocusDateTo={this.handleChangeFocusDateTo}
+        />
       </Container>
     );
   }

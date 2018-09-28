@@ -13,3 +13,20 @@
 .Button.Active {
   background-color: #acacac;
 }
+
+.Event {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  border: none;
+  background-color: #dcc04a;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.06px;
+  color: black;
+}

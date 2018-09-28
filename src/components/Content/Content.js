@@ -8,7 +8,7 @@ import Events from './../Events/Events';
 import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
 import { getNumberOfDays, getDayOfWeek, getEvents } from './../../utils/utils';
 
-const Content = ({ games, loading, mode, focusDate }) => {
+const Content = ({ games, loading, mode, focusDate, changeFocusDateTo }) => {
   const focusYear = focusDate.getFullYear();
   const focusMonth = focusDate.getMonth();
   const focusDay = focusDate.getDate();
@@ -33,7 +33,10 @@ const Content = ({ games, loading, mode, focusDate }) => {
 
           return (
             <Unit key={uuidv4()} label={MONTH_NAMES[month]}>
-              <Button onClick={() => console.log(new Date(focusYear, month))}>
+              <Button
+                onClick={() => changeFocusDateTo(new Date(focusYear, month))}
+                className="Event"
+              >
                 {events.length}
               </Button>
             </Unit>
@@ -125,7 +128,8 @@ Content.propTypes = {
   games: PropTypes.shape(),
   loading: PropTypes.bool.isRequired,
   mode: PropTypes.string.isRequired,
-  focusDate: PropTypes.instanceOf(Date).isRequired
+  focusDate: PropTypes.instanceOf(Date).isRequired,
+  changeFocusDateTo: PropTypes.func.isRequired
 };
 
 Content.defaultProps = {
