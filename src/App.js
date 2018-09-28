@@ -8,10 +8,11 @@ import Content from './components/Content/Content';
 
 class App extends Component {
   state = {
+    location: undefined,
     games: null,
     error: null,
     loading: false,
-    mode: 'year',
+    mode: 'week',
     focusDate: new Date()
   };
 
@@ -61,8 +62,8 @@ class App extends Component {
     } else if (to === 'prev' && mode === 'week') {
       const updFocusDate = new Date(+new Date(year, month, date) - (1000 * 60 * 60 * 24));
       return this.setState({ focusDate: updFocusDate }, () => {
-        if (!games[updFocusDate.getFullYear]) {
-          this.handleFetchGames(updFocusDate.getFullYear);
+        if (!games[updFocusDate.getFullYear()]) {
+          this.handleFetchGames(updFocusDate.getFullYear());
         }
       });
     } else if (to === 'next' && mode === 'year') {
@@ -82,8 +83,8 @@ class App extends Component {
     } else if (to === 'next' && mode === 'week') {
       const updFocusDate = new Date(+new Date(year, month, date) + (1000 * 60 * 60 * 24));
       return this.setState({ focusDate: updFocusDate }, () => {
-        if (!games[updFocusDate.getFullYear]) {
-          this.handleFetchGames(updFocusDate.getFullYear);
+        if (!games[updFocusDate.getFullYear()]) {
+          this.handleFetchGames(updFocusDate.getFullYear());
         }
       });
     }

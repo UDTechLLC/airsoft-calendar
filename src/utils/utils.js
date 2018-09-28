@@ -56,6 +56,22 @@ const splitLoop = gamesArr => {
   return array;
 };
 
+const getEvents = (events, from, to) => {
+  const timestamps = {
+    start: new Date(from.year, from.month, from.date).getTime(),
+    end: new Date(to.year, to.month, to.date).getTime()
+  };
+
+  const prepEvents = from.year === to.year
+    ? events[from.year]
+    : [...events[from.year], ...events[to.year]];
+
+  const res = _.filter(prepEvents, o => (
+    o.date_start >= (timestamps.start / 1000) && o.date_start <= (timestamps.end / 1000)
+  ));
+  return res;
+};
+
 export {
   updateObject,
   getNumberOfDays,
@@ -64,5 +80,6 @@ export {
   getDayOfWeek,
   isLeapYear,
   splitEventsArray,
-  splitLoop
+  splitLoop,
+  getEvents
 };
