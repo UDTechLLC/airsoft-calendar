@@ -8,7 +8,9 @@ import Events from './../Events/Events';
 import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
 import { getNumberOfDays, getDayOfWeek, getEvents } from './../../utils/utils';
 
-const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo, onScroll }) => {
+const Content = ({
+  games, loading, mode, focusDate, filter, changeFocusDateTo, onScroll, isMobile
+}) => {
   const focusYear = focusDate.getFullYear();
   const focusMonth = focusDate.getMonth();
   const focusDay = focusDate.getDate();
@@ -28,10 +30,19 @@ const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo, o
         const to = { year: focusYear, month: month + 1, date: 0 };
         const events = getEvents(games, from, to);
 
-        if (!events.length) return <Unit key={uuidv4()} label={MONTH_NAMES[month]} />;
+        if (!events.length) {
+          return (<Unit
+            key={uuidv4()}
+            label={!isMobile ? MONTH_NAMES[month] : MONTH_NAMES[month].substr(0, 3)}
+          />);
+        }
 
         return (
-          <Unit key={uuidv4()} label={MONTH_NAMES[month]}>
+          <Unit
+            key={uuidv4()}
+            label={!isMobile ? MONTH_NAMES[month] : MONTH_NAMES[month].substr(0, 3)}
+            className="Year"
+          >
             <Button
               onClick={() => changeFocusDateTo(new Date(focusYear, month, 16))}
               className="Event"
@@ -126,13 +137,15 @@ Content.propTypes = {
   focusDate: PropTypes.instanceOf(Date).isRequired,
   changeFocusDateTo: PropTypes.func.isRequired,
   filter: PropTypes.string,
-  onScroll: PropTypes.func
+  onScroll: PropTypes.func,
+  isMobile: PropTypes.bool,
 };
 
 Content.defaultProps = {
   games: {},
   filter: null,
-  onScroll: () => undefined
+  onScroll: () => undefined,
+  isMobile: false
 };
 
 export default Content;

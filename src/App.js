@@ -10,6 +10,7 @@ import Content from './components/Content/Content';
 
 class App extends Component {
   state = {
+    isMobile: window.innerWidth < 768,
     games: null,
     userData: null,
     error: null,
@@ -20,10 +21,19 @@ class App extends Component {
   };
 
   componentWillMount() {
+    window.addEventListener('resize', this.handleWindowSizeChange);
     this.handleFetchGames(null, () => this.handleFetchUserData(() => {
       this.setState({ loading: false });
     }));
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
+  }
+
+  handleWindowSizeChange = () => {
+    this.setState({ isMobile: window.innerWidth < 768 });
+  };
 
   handleFetchGames = (year = undefined, cb = () => undefined) => {
     this.setState({ loading: true });

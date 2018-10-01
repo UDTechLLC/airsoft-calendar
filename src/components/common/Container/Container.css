@@ -4,3 +4,10 @@
   position: relative;
   outline: none;
 }
+
+@media screen and (max-width: 767px) {
+  .Year {
+    max-width: calc(100% / 12);
+    overflow: hidden;
+  }
+}

@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import styles from './Unit.css';
 import { Container } from './../';
 
-const Unit = ({ label, children, weekend, onClick }) => (
-  <Container onClick={onClick}>
+const Unit = ({ label, children, weekend, onClick, className }) => (
+  <Container onClick={onClick} className={className} >
     <div className={styles.Label}>{label}</div>
     <div className={[styles.Content, !weekend ? undefined : styles.Light].join(' ')}>
       {children}
@@ -23,14 +23,19 @@ Unit.propTypes = {
     PropTypes.node
   ]),
   weekend: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  className: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string)
+  ])
 };
 
 Unit.defaultProps = {
   label: 'Label',
   children: null,
   weekend: false,
-  onClick: () => undefined
+  onClick: () => undefined,
+  className: undefined
 };
 
 export { Unit };

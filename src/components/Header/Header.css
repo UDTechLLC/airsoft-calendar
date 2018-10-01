@@ -23,3 +23,14 @@
 .Bottom {
   justify-content: space-between;
 }
+
+@media screen and (max-width: 767px) {
+  .Top {
+    flex-direction: column;
+  }
+
+  .Top > div {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
