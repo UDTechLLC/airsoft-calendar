@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import _ from 'lodash';
 
 import { API_URL } from './utils/const';
 import { filterGames } from './utils/utils';
@@ -91,14 +92,23 @@ class App extends Component {
       });
     }
   };
+  throttleManipulation = _.throttle(
+    to => this.handleManipulationBtnClick(to),
+    1080
+  );
 
   handleChangeFocusDateTo = (focusDate, mode = 'month') => this.setState({ focusDate, mode })
 
   handleScrollInstance = e => {
-    const { focusDate } = this.state;
+    e.preventDefault(); e.stopPropagation();
+    const { mode, focusDate } = this.state;
 
-    const daysFloat = Math.abs(e.deltaY) < 10 ? e.deltaY : e.deltaY / 100;
-    const date = focusDate.getDate() - parseInt(daysFloat, 10);
+    const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (mode === 'year') return this.throttleManipulation(delta < 0 ? 'prev' : 'next');
+
+    const inc = mode === 'month' ? 2 : 4;
+    const daysFloat = Math.abs(delta) <= 10 ? delta / inc : delta / 100 / inc;
+    const date = focusDate.getDate() + parseInt(daysFloat, 10);
 
     this.setState({ focusDate: new Date(focusDate.getFullYear(), focusDate.getMonth(), date) });
   }
@@ -108,7 +118,7 @@ class App extends Component {
     if (error) console.log(error);
 
     return (
-      <Container onScroll={e => this.handleScrollInstance(e)}>
+      <Container>
         <Header
           filter={filter}
           mode={mode}
@@ -120,6 +130,7 @@ class App extends Component {
           {...this.state}
           games={filterGames(games, filter, userData)}
           changeFocusDateTo={this.handleChangeFocusDateTo}
+          onScroll={e => this.handleScrollInstance(e)}
         />
       </Container>
     );

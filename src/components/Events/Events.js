@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
+import { withSize } from 'react-sizeme';
 
 import { splitEventsArray, splitLoop, getHoursFromTimestamps } from './../../utils/utils';
 import EventObject from './EventObject/EventObject';
@@ -9,7 +10,7 @@ import styles from './Events.css';
 
 class Events extends Component {
   renderContent = () => {
-    const { games } = this.props;
+    const { games, size } = this.props;
     const { mode, from } = this.props;
 
     // check if there`s some coincidence
@@ -36,16 +37,22 @@ class Events extends Component {
         key={uuidv4()}
         className={styles.EventsRow}
       >
-        {row.map(event => (
-          <EventObject
-            key={event.id}
-            event={event}
-            style={{
-              left: `${getHoursFromTimestamps(event.date_start, firstDay) * hourWidth}%`,
-              width: `${getHoursFromTimestamps(event.date_end, event.date_start) * hourWidth}%`
-            }}
-          />
-        ))}
+        {row.map(event => {
+          // data
+          const leftPerc = getHoursFromTimestamps(event.date_start, firstDay) * hourWidth;
+          const widthPerc = getHoursFromTimestamps(event.date_end, event.date_start) * hourWidth;
+          return (
+            <EventObject
+              key={event.id}
+              event={event}
+              width={widthPerc * (size.width / 100)}
+              style={{
+                left: `${leftPerc}%`,
+                width: `${widthPerc}%`
+              }}
+            />
+        );
+    })}
       </div>
     ));
   };
@@ -62,11 +69,12 @@ class Events extends Component {
 Events.propTypes = {
   games: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   mode: PropTypes.string,
-  from: PropTypes.shape().isRequired
+  from: PropTypes.shape().isRequired,
+  size: PropTypes.shape().isRequired
 };
 
 Events.defaultProps = {
   mode: 'week'
 };
 
-export default Events;
+export default withSize()(Events);

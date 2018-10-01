@@ -8,7 +8,7 @@ import Events from './../Events/Events';
 import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
 import { getNumberOfDays, getDayOfWeek, getEvents } from './../../utils/utils';
 
-const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo }) => {
+const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo, onScroll }) => {
   const focusYear = focusDate.getFullYear();
   const focusMonth = focusDate.getMonth();
   const focusDay = focusDate.getDate();
@@ -111,7 +111,7 @@ const Content = ({ games, loading, mode, focusDate, filter, changeFocusDateTo })
   };
 
   return (
-    <div className={styles.Wrapper}>
+    <div className={styles.Wrapper} onWheel={onScroll}>
       <Unit label={mode !== 'year' ? `${MONTH_NAMES[focusMonth]}, ${focusYear}` : focusYear}>
         {renderContent()}
       </Unit>
@@ -125,12 +125,14 @@ Content.propTypes = {
   mode: PropTypes.string.isRequired,
   focusDate: PropTypes.instanceOf(Date).isRequired,
   changeFocusDateTo: PropTypes.func.isRequired,
-  filter: PropTypes.string
+  filter: PropTypes.string,
+  onScroll: PropTypes.func
 };
 
 Content.defaultProps = {
   games: {},
-  filter: null
+  filter: null,
+  onScroll: () => undefined
 };
 
 export default Content;

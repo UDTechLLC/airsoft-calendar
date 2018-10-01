@@ -8,4 +8,5 @@
   min-height: 449px;
   justify-content: center;
   flex-direction: column;
+  overflow: hidden;
 }
