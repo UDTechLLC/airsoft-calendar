@@ -10,3 +10,31 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.EventButtonList {
+  display: inline-flex;
+  flex-direction: column;
+  flex: 1;
+  flex-grow: unset;
+  color: #000000;
+  font-family: Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.06px;
+}
+
+.EventButtonList > li {
+  padding: 0.7rem 3rem;
+  max-width: 8rem;
+  box-sizing: border-box;
+  margin-bottom: 1px
+}
+
+.Arrow {
+  position: absolute;
+  top: 50%;
+}
+
+.ArrowLeft { left: -7px }
+
+.ArrowRight { right: -7px }

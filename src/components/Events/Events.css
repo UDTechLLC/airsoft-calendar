@@ -14,5 +14,5 @@
 }
 
 .EventsRow:not(:last-of-type) {
-  margin-bottom: 0.3rem;
+  margin-bottom: 1px;
 }

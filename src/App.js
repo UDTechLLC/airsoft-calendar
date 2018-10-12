@@ -15,13 +15,19 @@ class App extends Component {
     userData: null,
     error: null,
     loading: false,
-    mode: 'month',
-    filter: null,
-    focusDate: new Date()
+    scale: 'week',
+    filters: {},
+    focusDate: new Date(),
+    locations: {
+      countries: [null],
+      regions: [null],
+      cities: [null]
+    }
   };
 
   componentWillMount() {
     window.addEventListener('resize', this.handleWindowSizeChange);
+
     this.handleFetchGames(null, () => this.handleFetchUserData(() => {
       this.setState({ loading: false });
     }));
@@ -43,7 +49,14 @@ class App extends Component {
 
     return axios.get(route)
       .then(({ data }) => (
-        this.setState({ games: { ...games, ...data.games } }, () => {
+        this.setState({
+          games: { ...games, ...data.games },
+          locations: {
+            countries: [null, ...data.countries],
+            regions: [null, ...data.regions],
+            cities: [null, ...data.cities]
+          }
+        }, () => {
           if (!year) return cb();
 
           this.setState({ loading: false }, () => cb());
@@ -55,26 +68,39 @@ class App extends Component {
   handleFetchUserData = (cb = () => undefined) => {
     const id = localStorage.getItem('airsoft-user-unique-id');
 
-    if (!id) return this.setState({ filter: 'world' }, () => cb());
+    if (!id) return this.setState({ filters: {} }, () => cb());
 
     return axios.get(`${API_URL}/user/get-place/${id}`)
-      .then(({ data }) => this.setState({ userData: data, filter: 'region' }, () => cb()))
+      .then(({ data }) => this.setState({
+        userData: data,
+        filters: {
+          countries: data.country,
+          regions: data.region,
+          cities: data.city,
+        }
+      }, () => cb()))
       .catch(({ response }) => this.setState({ error: response.message }, () => cb()));
+  }
+
+  handleChangeFilter = (k, v) => {
+    const { filters } = this.state;
+
+    this.setState({ filters: { ...filters, [k]: v } });
   }
 
   handleRemoveErrors = () => this.setState({ error: null, loading: false });
 
-  handleChangeMode = (mode, cb = () => undefined) => {
-    this.setState({ mode: mode || this.state.mode }, cb());
+  handleChangeScale = (scale, cb = () => undefined) => {
+    this.setState({ scale: scale || this.state.scale }, cb());
   };
 
   handleManipulationBtnClick = to => {
-    const { focusDate, mode, games } = this.state;
+    const { focusDate, scale, games } = this.state;
     const year = focusDate.getFullYear();
     const month = focusDate.getMonth();
     const date = focusDate.getDate();
 
-    if (to === 'prev' && mode === 'year') {
+    if (to === 'prev' && scale === 'year') {
       return this.setState({ focusDate: new Date(year - 1, month, date) }, () => {
         if (!games[year - 1]) {
           this.handleFetchGames(year - 1);
@@ -87,7 +113,7 @@ class App extends Component {
           this.handleFetchGames(updFocusDate.getFullYear());
         }
       });
-    } else if (to === 'next' && mode === 'year') {
+    } else if (to === 'next' && scale === 'year') {
       return this.setState({ focusDate: new Date(year + 1, month, date) }, () => {
         if (!games[year + 1]) {
           this.handleFetchGames(year + 1);
@@ -107,16 +133,16 @@ class App extends Component {
     1080
   );
 
-  handleChangeFocusDateTo = (focusDate, mode = 'month') => this.setState({ focusDate, mode })
+  handleChangeFocusDateTo = (focusDate, scale = 'month') => this.setState({ focusDate, scale })
 
   handleScrollInstance = e => {
     e.preventDefault(); e.stopPropagation();
-    const { mode, focusDate } = this.state;
+    const { scale, focusDate } = this.state;
 
     const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if (mode === 'year') return this.throttleManipulation(delta < 0 ? 'prev' : 'next');
+    if (scale === 'year') return this.throttleManipulation(delta < 0 ? 'prev' : 'next');
 
-    const inc = mode === 'month' ? 2 : 4;
+    const inc = scale === 'month' ? 2 : 4;
     const daysFloat = Math.abs(delta) <= 10 ? delta / inc : delta / 100 / inc;
     const date = focusDate.getDate() + parseInt(daysFloat, 10);
 
@@ -124,22 +150,23 @@ class App extends Component {
   }
 
   render() {
-    const { mode, games, error, userData, filter } = this.state;
-    if (error) console.log(error);
+    const { scale, games, error, filters, locations } = this.state;
+    if (error) console.error(error);
 
     return (
       <Container>
         <Header
-          filter={filter}
-          mode={mode}
-          changeMode={this.handleChangeMode}
-          onManipulationClick={to => this.handleManipulationBtnClick(to)}
-          onChangeFilter={f => this.setState({ filter: f })}
+          filters={filters}
+          scale={scale}
+          changeScale={this.handleChangeScale}
+          onChangeFilter={this.handleChangeFilter}
+          locations={locations}
         />
         <Content
           {...this.state}
-          games={filterGames(games, filter, userData)}
+          games={filterGames(games, filters)}
           changeFocusDateTo={this.handleChangeFocusDateTo}
+          onManipulationClick={to => this.handleManipulationBtnClick(to)}
           onScroll={e => this.handleScrollInstance(e)}
         />
       </Container>

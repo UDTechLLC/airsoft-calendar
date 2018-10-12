@@ -11,7 +11,7 @@ import styles from './Events.css';
 class Events extends Component {
   renderContent = () => {
     const { games, size } = this.props;
-    const { mode, from } = this.props;
+    const { scale, from } = this.props;
 
     // check if there`s some coincidence
     let gamesArr = splitEventsArray(games);
@@ -27,7 +27,7 @@ class Events extends Component {
     //  if there is no games
     if (!gamesArr[0].length) return undefined;
 
-    const days = mode === 'month' ? 31 : 7;
+    const days = scale === 'month' ? 31 : 7;
     const hourWidth = 100 / days / 24;
 
     const firstDay = new Date(from.year, from.month, from.date).getTime() / 1000;
@@ -68,13 +68,13 @@ class Events extends Component {
 
 Events.propTypes = {
   games: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  mode: PropTypes.string,
+  scale: PropTypes.string,
   from: PropTypes.shape().isRequired,
   size: PropTypes.shape().isRequired
 };
 
 Events.defaultProps = {
-  mode: 'week'
+  scale: 'week'
 };
 
 export default withSize()(Events);

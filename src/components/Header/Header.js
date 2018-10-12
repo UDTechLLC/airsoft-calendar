@@ -1,16 +1,47 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { v4 } from 'uuid';
 
-import { Button, Container } from './../common';
+import { Container, Select, Button } from './../common';
 
 import styles from './Header.css';
-
-const Header = ({ filter, mode, changeMode, onManipulationClick, onChangeFilter }) => (
-  <Container>
+/* filter, mode, changeMode, onManipulationClick, onChangeFilter, */
+const Header = ({ filters, scale, changeScale, locations, onChangeFilter }) => (
+  <Container style={{ zIndex: 1 }}>
+    <div className={styles.Filters}>
+      {Object.keys(locations).map(k => (
+        <Select
+          key={v4()}
+          options={locations[k]}
+          active={filters[k]}
+          onClick={v => onChangeFilter(k, v)}
+        />
+      ))}
+    </div>
+    <div className={styles.Scale}>
+      <div
+        className={[
+          styles.ScaleButtons,
+          scale === 'week' ? undefined : (scale === 'month' ? styles.Month : styles.Year)
+        ].join(' ')}
+      >
+        <Button onClick={() => changeScale('week')}>
+          Week
+        </Button>
+        <Button onClick={() => changeScale('month')}>
+          Month
+        </Button>
+        <Button onClick={() => changeScale('year')}>
+          Year
+        </Button>
+      </div>
+    </div>
+    {/*
     <div className={styles.Top}>
       <div>
         <Button
-          className={filter !== 'city' ? undefined : 'Active'}
+          className={filters !== 'city' ? undefined : 'Active'}
           onClick={() => onChangeFilter('city')}
         >
           City
@@ -60,19 +91,21 @@ const Header = ({ filter, mode, changeMode, onManipulationClick, onChangeFilter 
       <Button onClick={() => onManipulationClick('prev')}>&#171;</Button>
       <Button onClick={() => onManipulationClick('next')}>&#187;</Button>
     </div>
+    */}
   </Container>
 );
 
 Header.propTypes = {
-  mode: PropTypes.string.isRequired,
-  changeMode: PropTypes.func.isRequired,
-  onManipulationClick: PropTypes.func.isRequired,
-  filter: PropTypes.string,
-  onChangeFilter: PropTypes.func.isRequired
+  scale: PropTypes.string.isRequired,
+  changeScale: PropTypes.func.isRequired,
+  // onManipulationClick: PropTypes.func.isRequired,
+  filters: PropTypes.shape(),
+  onChangeFilter: PropTypes.func.isRequired,
+  locations: PropTypes.shape().isRequired
 };
 
 Header.defaultProps = {
-  filter: null
+  filters: {}
 };
 
 export default Header;

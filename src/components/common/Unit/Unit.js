@@ -4,11 +4,26 @@ import PropTypes from 'prop-types';
 import styles from './Unit.css';
 import { Container } from './../';
 
-const Unit = ({ label, children, weekend, onClick, className }) => (
-  <Container onClick={onClick} className={className} >
+const Unit = ({
+  label, children, weekend, onClick, commonStyle, lowLevel, midLevel, className
+}) => (
+  <Container
+    onClick={onClick}
+    commonStyle={commonStyle}
+    className={className}
+  >
     <div className={styles.Label}>{label}</div>
-    <div className={[styles.Content, !weekend ? undefined : styles.Light].join(' ')}>
-      {children}
+    <div
+      className={[
+        styles.Content,
+        !weekend ? undefined : styles.Light,
+        !lowLevel ? undefined : styles.LowLevel,
+        !midLevel ? undefined : styles.MidLevel
+      ].join(' ')}
+    >
+      <span>
+        {children}
+      </span>
     </div>
   </Container>
 );
@@ -24,6 +39,9 @@ Unit.propTypes = {
   ]),
   weekend: PropTypes.bool,
   onClick: PropTypes.func,
+  commonStyle: PropTypes.shape(),
+  lowLevel: PropTypes.bool,
+  midLevel: PropTypes.bool,
   className: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.string)
@@ -35,6 +53,9 @@ Unit.defaultProps = {
   children: null,
   weekend: false,
   onClick: () => undefined,
+  commonStyle: {},
+  lowLevel: false,
+  midLevel: false,
   className: undefined
 };
 

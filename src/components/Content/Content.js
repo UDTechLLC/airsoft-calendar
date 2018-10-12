@@ -1,21 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
+import _ from 'lodash';
 
 import styles from './Content.css';
 import { Button, Spinner, Unit, Container } from './../common';
 import Events from './../Events/Events';
 import { MONTH_NAMES, DAY_NAMES } from './../../utils/const';
 import { getNumberOfDays, getDayOfWeek, getEvents } from './../../utils/utils';
+import gameTypeColor from './../../utils/gameTypeColor';
 
 const Content = ({
-  games, loading, mode, focusDate, filter, changeFocusDateTo, onScroll, isMobile
+  games, loading, scale, focusDate, changeFocusDateTo, onScroll, isMobile, onManipulationClick
 }) => {
   const focusYear = focusDate.getFullYear();
   const focusMonth = focusDate.getMonth();
   const focusDay = focusDate.getDate();
 
-  if (games === null || loading || !filter) {
+  if (games === null || loading) {
     return (
       <div className={styles.Wrapper}>
         <Spinner />
@@ -24,7 +26,7 @@ const Content = ({
   }
 
   const renderContent = () => {
-    if (mode === 'year') {
+    if (scale === 'year') {
       return Array.apply([], Array(12)).map((v, month) => {
         const from = { year: focusYear, month, date: 1 };
         const to = { year: focusYear, month: month + 1, date: 0 };
@@ -33,13 +35,17 @@ const Content = ({
         if (!events.length) {
           return (<Unit
             key={uuidv4()}
+            lowLevel
             label={!isMobile ? MONTH_NAMES[month] : MONTH_NAMES[month].substr(0, 3)}
           />);
         }
 
+        const eventsByType = _.countBy(events.map(e => e.type));
+
         return (
           <Unit
             key={uuidv4()}
+            lowLevel
             label={!isMobile ? MONTH_NAMES[month] : MONTH_NAMES[month].substr(0, 3)}
             className="Year"
           >
@@ -47,7 +53,16 @@ const Content = ({
               onClick={() => changeFocusDateTo(new Date(focusYear, month, 16))}
               className="Event"
             >
-              {events.length}
+              <ul className={styles.EventButtonList}>
+                {Object.keys(eventsByType).map(k => (
+                  <li
+                    key={uuidv4()}
+                    style={{ backgroundColor: gameTypeColor(k) }}
+                  >
+                    {eventsByType[k]}
+                  </li>
+                ))}
+              </ul>
             </Button>
           </Unit>
         );
@@ -59,7 +74,7 @@ const Content = ({
     return (
       <Container row>
         {days}
-        <Events games={getEvents(games, from, to, true)} from={from} mode={mode} />
+        <Events games={getEvents(games, from, to, true)} from={from} scale={scale} />
       </Container>
     );
   };
@@ -68,14 +83,14 @@ const Content = ({
     let from = { year: focusYear, month: focusMonth, date: 1 };
     let to = { year: focusYear, month: focusMonth !== 11 ? focusMonth + 1 : 0, date: 0 };
 
-    const daysNumber = mode !== 'month' ? 7 : 31;
+    const daysNumber = scale !== 'month' ? 7 : 31;
     const daysInMonth = getNumberOfDays(focusYear, focusMonth);
 
     const getData = (y, m, d) => {
       const updMonth = d <= daysInMonth ? focusMonth : m;
       const updYear = d <= daysInMonth ? focusYear : y;
 
-      if (mode === 'month') {
+      if (scale === 'month') {
         const dayOfWeek = getDayOfWeek(focusYear, focusMonth, (focusDay - 15) + d);
         const label = DAY_NAMES[dayOfWeek].substr(0, 3);
 
@@ -107,8 +122,9 @@ const Content = ({
           key={uuidv4()}
           label={label}
           weekend={dayOfWeek === 0 || dayOfWeek === 6}
+          lowLevel
           onClick={() => (
-            mode === 'month'
+            scale === 'month'
               ? changeFocusDateTo(new Date(updYear, updMonth, updDate), 'week')
               : undefined
           )}
@@ -123,8 +139,14 @@ const Content = ({
 
   return (
     <div className={styles.Wrapper} onWheel={onScroll}>
-      <Unit label={mode !== 'year' ? `${MONTH_NAMES[focusMonth]}, ${focusYear}` : focusYear}>
+      <Unit midLevel label={scale !== 'year' ? `${MONTH_NAMES[focusMonth].toUpperCase()} ${focusYear}` : focusYear}>
         {renderContent()}
+        <div className={[styles.Arrow, styles.ArrowLeft].join(' ')}>
+          <Button className="Arrow" onClick={() => onManipulationClick('prev')}>&#60;</Button>
+        </div>
+        <div className={[styles.Arrow, styles.ArrowRight].join(' ')}>
+          <Button className="Arrow" onClick={() => onManipulationClick('next')}>&#62;</Button>
+        </div>
       </Unit>
     </div>
   );
@@ -133,17 +155,16 @@ const Content = ({
 Content.propTypes = {
   games: PropTypes.shape(),
   loading: PropTypes.bool.isRequired,
-  mode: PropTypes.string.isRequired,
+  scale: PropTypes.string.isRequired,
   focusDate: PropTypes.instanceOf(Date).isRequired,
   changeFocusDateTo: PropTypes.func.isRequired,
-  filter: PropTypes.string,
   onScroll: PropTypes.func,
   isMobile: PropTypes.bool,
+  onManipulationClick: PropTypes.func.isRequired
 };
 
 Content.defaultProps = {
   games: {},
-  filter: null,
   onScroll: () => undefined,
   isMobile: false
 };

@@ -1,6 +1,4 @@
 .Wrapper {
-  height: 2.4rem;
-  /* border-radius: 1.2rem; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,6 +8,7 @@
   letter-spacing: -0.06px;
   position: absolute;
   top: 0;
+  font-family: Helvetica, sans-serif;
 }
 
 .Content {
@@ -17,19 +16,23 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem;
+  padding: 0.7rem 1px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .HoverInfo {
   position: absolute;
-  width: 100px;
-  padding: 15px;
+  width: auto;
+  padding: 1.3rem 2rem;
   background-color: #fff;
   display: none;
   top: 100%;
   left: 50%;
+  font-family: Helvetica, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 2.4rem;
 }
 
 .Wrapper:hover .HoverInfo {

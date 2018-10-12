@@ -1,20 +1,43 @@
 .Label {
   display: flex;
   min-height: 4.2rem;
-  border-bottom: 2px solid #393939;
-  font-weight: 700;
-  background-color: #505050;
+  border: none;
+  background-color: #313131;
   align-items: center;
   justify-content: center;
+  font-family: Helvetica, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.08px;
 }
 
-.Content {
+.Content, .Content>span {
   display: flex;
   position: relative;
-  padding: 0.4rem;
   flex: 1;
 }
 
-.Light {
-  background-color: #505050;
+.Content {
+  position: relative;
+  background-color: #313131;
+  font-family: Helvetica, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.08px;
 }
+
+.Content.LowLevel>span {
+  background-color: transparent;
+  background-color: #393939;
+  margin-right: 2.5px;
+  justify-content: flex-end;
+  padding: 6px 3px;
+  color: #676767;
+}
+
+.Content.LowLevel.Light>span {
+  background-color: #505050;
+  color: #fff;
+}
+
+.Content.MidLevel { padding: 0 7px }

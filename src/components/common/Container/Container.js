@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import styles from './Container.css';
 
-const Container = ({ children, row, onClick, className }) => {
+const Container = ({ children, row, commonStyle, onClick, className }) => {
   const renderClassNames = () => {
     if (!className) return styles.Wrapper;
     else if (typeof className === 'string') return [styles.Wrapper, styles[className]].join(' ');
@@ -14,7 +14,10 @@ const Container = ({ children, row, onClick, className }) => {
   return (
     <div
       className={renderClassNames()}
-      style={{ flexDirection: !row ? 'column' : 'row' }}
+      style={{
+        flexDirection: !row ? 'column' : 'row',
+        ...commonStyle
+      }}
       onClick={onClick}
       onKeyPress={undefined}
       role="button"
@@ -35,12 +38,14 @@ Container.propTypes = {
   className: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.string)
-  ])
+  ]),
+  commonStyle: PropTypes.shape()
 };
 
 Container.defaultProps = {
   children: undefined,
   row: false,
+  commonStyle: {},
   onClick: () => undefined,
   className: null
 };
