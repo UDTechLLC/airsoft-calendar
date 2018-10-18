@@ -38,3 +38,19 @@
 .Wrapper:hover .HoverInfo {
   display: block;
 }
+
+.TooltipText > p {
+  color: #000000;
+  font-family: Helvetica;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.TooltipText > p:last-of-type, .TooltipText > p:nth-last-of-type(2) {
+  color: #e40000;
+}
+
+.TooltipText > p > strong {
+  font-weight: 700;
+}

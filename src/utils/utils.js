@@ -78,17 +78,19 @@ const getEvents = (events, from, to, includeEndings = false) => {
 };
 
 const filterGames = (games, filters) => {
-  console.log(games);
-  if (!filters || !filters.length) return games;
-  // TODO: rewrite filters functionality
-  _.mapValues(games, (v, k) => (
-    _.filter(games[k], o => {
-      console.log(o);
-      // _.mapValues(filters, (v, k) => );
-    })
-  ));
-  // console.log(mv);
-  return games;
+  if (_.isEmpty(filters)) return games;
+
+  const result = _.mapValues(games, o => (_.filter(o, g => {
+    const isNotAccepted = Object.keys(filters).map(k => {
+      if (k === 'gameType') return filters[k] ? g.type === filters[k] : true;
+
+      return filters[k] ? g[k] === filters[k] : true;
+    }).includes(false);
+
+    return !isNotAccepted;
+  })));
+
+  return result;
 };
 
 export {

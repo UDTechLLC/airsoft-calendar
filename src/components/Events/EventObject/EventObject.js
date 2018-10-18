@@ -8,6 +8,7 @@ import gameTypeColor from './../../../utils/gameTypeColor';
 
 const EventObject = ({ style, event, width }) => {
   const id = uuidv4();
+  const opacity = new Date() > new Date(event.date_end * 1000) ? 0.65 : 1;
 
   const getHM = timestamp => {
     const date = new Date(timestamp * 1000);
@@ -19,7 +20,7 @@ const EventObject = ({ style, event, width }) => {
   const renderLine = () => {
     if (width >= 120) {
       return (
-        <div className={styles.Content} data-tip data-for={id}>
+        <div className={styles.Content} style={{ opacity }} data-tip data-for={id}>
           <span>{getHM(event.date_start)}</span>
           <span
             style={{
@@ -36,7 +37,7 @@ const EventObject = ({ style, event, width }) => {
       );
     } else if (width >= 82) {
       return (
-        <div className={styles.Content} data-tip data-for={id}>
+        <div className={styles.Content} style={{ opacity }} data-tip data-for={id}>
           <span>{getHM(event.date_start)}</span>
           <span>{getHM(event.date_end)}</span>
         </div>
@@ -44,7 +45,7 @@ const EventObject = ({ style, event, width }) => {
     }
 
     return (
-      <div className={styles.Content} data-tip data-for={id}>
+      <div className={styles.Content} style={{ opacity }} data-tip data-for={id}>
         <span
           style={width > 40 ? {
             whiteSpace: 'nowrap',
@@ -64,27 +65,33 @@ const EventObject = ({ style, event, width }) => {
   return (
     <div
       className={styles.Wrapper}
-      style={{ backgroundColor: gameTypeColor(event.type), ...style }}
+      style={{
+        backgroundColor: gameTypeColor(event.type),
+        opacity,
+        ...style
+      }}
     >
       {renderLine()}
       <ReactTooltip place="bottom" type="light" effect="float" id={id}>
-        <p><strong>{`"${event.name}"`}</strong></p>
-        <p>Тип игры: <strong>{event.type.toString()}</strong></p>
-        <p>Полигон: <strong>{event.polygon.toString()}</strong></p>
-        <p>
-          <strong>
-            {event.country.toString()} {event.region.toString()} {event.city.toString()}
-          </strong>
-        </p>
-        <p>Организатор: <strong>{event.org_name.toString()}</strong></p>
-        <p>Старт: <strong>{event.date_start_formatted.toString()}</strong></p>
-        <p>Финиш: <strong>{event.date_end_formatted.toString()}</strong></p>
-        <p className={styles.Important}>
-          Цена билетов: <strong>{event.ticket_price.toString()}</strong>
-        </p>
-        <p className={styles.Important}>
-          Куплено билетов: <strong>{event.tickets_count.toString()}</strong>
-        </p>
+        <div className={styles.TooltipText}>
+          <p><strong>{`"${event.name}"`}</strong></p>
+          <p>Тип игры: <strong>{event.type.toString()}</strong></p>
+          <p>Полигон: <strong>{event.polygon.toString()}</strong></p>
+          <p>
+            <strong>
+              {event.country.toString()} {event.region.toString()} {event.city.toString()}
+            </strong>
+          </p>
+          <p>Организатор: <strong>{event.org_name.toString()}</strong></p>
+          <p>Старт: <strong>{event.date_start_formatted.toString()}</strong></p>
+          <p>Финиш: <strong>{event.date_end_formatted.toString()}</strong></p>
+          <p className={styles.Important}>
+            Цена билетов: <strong>{event.ticket_price.toString()}</strong>
+          </p>
+          <p className={styles.Important}>
+            Куплено билетов: <strong>{event.tickets_count.toString()}</strong>
+          </p>
+        </div>
         {/* Object.keys(event).map((k, i) => <p key={i}>{k}: {event[k]}</p>) */}
       </ReactTooltip>
     </div>

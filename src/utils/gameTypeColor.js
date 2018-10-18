@@ -10,7 +10,7 @@ const gameTypeColor = type => {
       return '#fff47e';
     case 'CQB':
       return '#f4c792';
-    case 'Антитерор':
+    case 'Антитеррор':
       return '#b58fbc';
     case 'Реконструкция':
       return '#9f7e58';
@@ -20,8 +20,10 @@ const gameTypeColor = type => {
       return '#99c455';
     case 'Ночная':
       return '#58b8b3';
-    default:
+    case 'Ролевая':
       return '#ffc809';
+    default:
+      return 'rgba(162, 162, 162)';
   }
 };
 

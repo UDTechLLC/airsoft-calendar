@@ -16,13 +16,9 @@ class App extends Component {
     error: null,
     loading: false,
     scale: 'week',
-    filters: {},
     focusDate: new Date(),
-    locations: {
-      countries: [null],
-      regions: [null],
-      cities: [null]
-    }
+    filters: {},
+    availableFilters: {}
   };
 
   componentWillMount() {
@@ -45,17 +41,13 @@ class App extends Component {
     this.setState({ loading: true });
 
     const route = year ? `${API_URL}/game/calendar/${year}` : `${API_URL}/game/calendar`;
-    const { games } = this.state;
+    const { games, availableFilters } = this.state;
 
     return axios.get(route)
       .then(({ data }) => (
         this.setState({
           games: { ...games, ...data.games },
-          locations: {
-            countries: [null, ...data.countries],
-            regions: [null, ...data.regions],
-            cities: [null, ...data.cities]
-          }
+          availableFilters: { ...availableFilters, ...data.filter }
         }, () => {
           if (!year) return cb();
 
@@ -74,9 +66,10 @@ class App extends Component {
       .then(({ data }) => this.setState({
         userData: data,
         filters: {
-          countries: data.country,
-          regions: data.region,
-          cities: data.city,
+          country: data.country,
+          region: data.region,
+          city: data.city,
+          gameType: null
         }
       }, () => cb()))
       .catch(({ response }) => this.setState({ error: response.message }, () => cb()));
@@ -84,6 +77,12 @@ class App extends Component {
 
   handleChangeFilter = (k, v) => {
     const { filters } = this.state;
+
+    if (k === 'country' && filters.country !== v) {
+      return this.setState({ filters: { ...filters, [k]: v, region: null, city: null } });
+    } else if (k === 'region' && filters.region !== v) {
+      return this.setState({ filters: { ...filters, [k]: v, city: null } });
+    }
 
     this.setState({ filters: { ...filters, [k]: v } });
   }
@@ -150,8 +149,12 @@ class App extends Component {
   }
 
   render() {
-    const { scale, games, error, filters, locations } = this.state;
+    const { scale, games, error, filters, focusDate, availableFilters } = this.state;
     if (error) console.error(error);
+    const filtersThisYear = !_.isEmpty(availableFilters) &&
+      availableFilters[focusDate.getFullYear()] ?
+      availableFilters[focusDate.getFullYear()] :
+      { address: {}, game_types: [] };
 
     return (
       <Container>
@@ -160,7 +163,7 @@ class App extends Component {
           scale={scale}
           changeScale={this.handleChangeScale}
           onChangeFilter={this.handleChangeFilter}
-          locations={locations}
+          availableFilters={filtersThisYear}
         />
         <Content
           {...this.state}

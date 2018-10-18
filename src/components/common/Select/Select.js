@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { v4 } from 'uuid';
 
 import styles from './Select.css';
-import { Spinner } from './..';
 
-const Select = ({ options, active = options[0], onClick }) => (
+const Select = ({ options, active = options[0], onClick, placeholder }) => (
   <div className={styles.Wrapper}>
     <div className={styles.Preview}>
-      {active !== null ? active : <Spinner />}
+      {active !== null ? active : placeholder}
     </div>
     <div className={styles.List}>
       <ul>
@@ -22,7 +21,7 @@ const Select = ({ options, active = options[0], onClick }) => (
                 role="button"
                 tabIndex="0"
               >
-                {item}
+                {item || placeholder}
               </li>
             ))
         }
@@ -37,12 +36,14 @@ Select.propTypes = {
     PropTypes.string,
     PropTypes.number
   ]),
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  placeholder: PropTypes.string
 };
 
 Select.defaultProps = {
   active: undefined,
-  onClick: () => undefined
+  onClick: () => undefined,
+  placeholder: 'Select one'
 };
 
 export { Select };
